@@ -9,11 +9,13 @@ body.access-low-vision {
   font-size: 120%;
 }
 body.access-low-vision .hint,
-body.access-low-vision .intro {
-  color: #e8e2d4; /* muted secondary text is intentionally low-contrast by
-    default for a dark theme (design polish) — boosted here since that's
-    exactly the kind of low-contrast text a low-vision user is least able
-    to read */
+body.access-low-vision .intro,
+body.access-low-vision .tagline,
+body.access-low-vision .caption {
+  color: #241f1a; /* muted secondary text is intentionally lower-contrast by
+    default (design polish) — boosted here since that's exactly the kind of
+    text a low-vision user is least able to read. Dark-on-light everywhere
+    now that every page shares the same light theme. */
 }
 body.access-low-vision button,
 body.access-low-vision .upload-label {
@@ -24,6 +26,20 @@ body.access-dyslexic {
   font-family: Verdana, Arial, sans-serif !important;
   line-height: 1.8 !important;
   letter-spacing: 0.02em !important;
+}
+/* Headings (h1/h2/h3) set their own explicit font-family in each page's
+   stylesheet, so the body-level rule above -- while !important -- doesn't
+   reach them: an element's own explicit declaration always wins over an
+   inherited value, important or not, since !important only decides which
+   declaration wins when more than one directly targets the same element.
+   Dyslexia guidance is about reading text generally, not just paragraphs,
+   so headings need their own explicit override too. */
+body.access-dyslexic h1,
+body.access-dyslexic h2,
+body.access-dyslexic h3,
+body.access-dyslexic .question,
+body.access-dyslexic .mode-name {
+  font-family: Verdana, Arial, sans-serif !important;
 }
 body.access-dyslexic p,
 body.access-dyslexic li {

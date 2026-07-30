@@ -11,7 +11,7 @@ html, body {
   inset: 0;
   width: 100vw;
   height: 100dvh;
-  font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 #webcam { display: none; }
@@ -34,19 +34,19 @@ html, body {
   align-items: center;
   gap: 10px;
   z-index: 11;
-  font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   font-size: 13px;
   white-space: nowrap;
 }
 #modeHeader .home-link { color: #a89f8c; text-decoration: none; }
-#modeHeader .home-link:hover, #modeHeader .home-link:focus-visible { color: #e8a13d; outline: none; }
-#modeHeader .mode-name { color: #e8a13d; font-weight: bold; }
+#modeHeader .home-link:hover, #modeHeader .home-link:focus-visible { color: #5b6b8c; outline: none; }
+#modeHeader .mode-name { font-family: 'Playfair Display', Georgia, serif; color: #5b6b8c; font-weight: 600; }
 
 #keySelect, #toneSelect {
   position: absolute;
   left: 12px;
   background: #1a1a1a;
-  color: #e8a13d;
+  color: #5b6b8c;
   border: 1px solid #3a3428;
   border-radius: 4px;
   font-family: inherit;
@@ -56,17 +56,17 @@ html, body {
 }
 #keySelect { top: 12px; }
 #toneSelect { top: 48px; }
-#keySelect:focus-visible, #toneSelect:focus-visible { outline: 2px solid #e8a13d; }
+#keySelect:focus-visible, #toneSelect:focus-visible { outline: 2px solid #5b6b8c; }
 
 #chordDisplay {
   position: absolute;
   bottom: 34px;
   left: 50%;
   transform: translateX(-50%);
-  color: #e8a13d;
+  color: #5b6b8c;
   font-size: 56px;
   font-weight: bold;
-  text-shadow: 0 0 12px rgba(232, 161, 61, 0.6);
+  text-shadow: 0 0 12px rgba(91, 107, 140, 0.6);
   pointer-events: none;
   white-space: nowrap;
 }
@@ -75,7 +75,7 @@ html, body {
   bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
-  color: #e8a13d;
+  color: #5b6b8c;
   font-size: 14px;
   pointer-events: none;
   white-space: nowrap;
@@ -91,13 +91,13 @@ html, body {
   pointer-events: none;
 }
 .vol-bar { width: 70px; height: 8px; background: #3a3428; border-radius: 2px; }
-.vol-bar.lit { background: #e8a13d; }
+.vol-bar.lit { background: #5b6b8c; }
 
 #distortionDisplay {
   position: absolute;
   top: 105px;
   right: 12px;
-  color: #e8a13d;
+  color: #5b6b8c;
   font-size: 14px;
   text-align: right;
   pointer-events: none;
@@ -106,7 +106,7 @@ html, body {
 #helpButton, #recordBtn, #muteBtn {
   border-radius: 21px;
   background: rgba(20, 20, 20, 0.85);
-  color: #e8a13d;
+  color: #5b6b8c;
   border: 1px solid #3a3428;
   cursor: pointer;
   z-index: 6;
@@ -137,8 +137,8 @@ html, body {
   color: #e34848;
   animation: recordPulse 1.5s ease-in-out infinite;
 }
-#muteBtn[aria-pressed="true"] { border-color: #e8a13d; }
-#helpButton:focus-visible, #recordBtn:focus-visible, #muteBtn:focus-visible { outline: 2px solid #e8a13d; }
+#muteBtn[aria-pressed="true"] { border-color: #5b6b8c; }
+#helpButton:focus-visible, #recordBtn:focus-visible, #muteBtn:focus-visible { outline: 2px solid #5b6b8c; }
 
 @keyframes recordPulse {
   0%, 100% { opacity: 1; }
@@ -159,7 +159,7 @@ html, body {
 .help-content {
   background: #1a1a1a;
   color: white;
-  border: 1px solid #e8a13d;
+  border: 1px solid #5b6b8c;
   border-radius: 10px;
   width: min(500px, 90vw);
   max-height: 80vh;
@@ -167,13 +167,13 @@ html, body {
   padding: 24px;
   font-family: inherit;
 }
-.help-content h2, .help-content h3 { color: #e8a13d; }
+.help-content h2, .help-content h3 { font-family: 'Playfair Display', Georgia, serif; color: #5b6b8c; }
 .help-content p { line-height: 1.5; }
 #closeHelp {
   float: right;
   background: none;
   border: none;
-  color: #e8a13d;
+  color: #5b6b8c;
   font-size: 20px;
   cursor: pointer;
 }
@@ -193,7 +193,7 @@ html, body {
   box-sizing: border-box;
 }
 #startOverlay.hidden { display: none; }
-#startOverlay:focus-visible { outline: 3px solid #e8a13d; outline-offset: -3px; }
+#startOverlay:focus-visible { outline: 3px solid #5b6b8c; outline-offset: -3px; }
 
 .start-circle {
   width: 72px;

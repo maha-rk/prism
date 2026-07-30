@@ -1,9 +1,9 @@
 html, body {
   margin: 0;
   min-height: 100%;
-  background: #111;
-  color: #f0ece2;
-  font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+  background: #f2ede6;
+  color: #241f1a;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 #app {
@@ -14,55 +14,61 @@ html, body {
 
 .home-link {
   display: inline-block;
-  color: #a89f8c;
+  color: #5c554a;
   text-decoration: none;
   font-size: 13px;
   margin-bottom: 16px;
 }
-.home-link:hover, .home-link:focus-visible { color: #e8a13d; outline: none; }
+.home-link:hover, .home-link:focus-visible { color: #c9793f; outline: none; }
 
 h1 {
-  color: #e8a13d;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 500;
+  color: #241f1a;
   margin-bottom: 4px;
+}
+h2, h3 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 500;
 }
 
 .intro, .hint {
-  color: #c9c2b3;
+  color: #5c554a;
   line-height: 1.5;
 }
 
 section {
   margin-top: 32px;
   padding-top: 24px;
-  border-top: 1px solid #3a3428;
+  border-top: 1px solid #e2dcd2;
 }
 .hidden { display: none; }
 
 .mock-warning {
-  background: #2a1a10;
-  border: 1px solid #e8a13d;
+  background: #f8ece0;
+  border: 1px solid #c9793f;
   border-radius: 6px;
   padding: 12px 14px;
-  color: #f0ece2;
+  color: #241f1a;
   font-size: 14px;
   line-height: 1.5;
 }
 
 .upload-label {
   display: inline-block;
-  background: #1a1a1a;
-  border: 1px solid #3a3428;
+  background: #f8f5f0;
+  border: 1px solid #d8d0c4;
   border-radius: 6px;
   padding: 10px 16px;
-  color: #e8a13d;
+  color: #c9793f;
   cursor: pointer;
 }
 .upload-label input { display: block; margin-top: 8px; }
 
 button {
-  background: #1a1a1a;
-  color: #e8a13d;
-  border: 1px solid #3a3428;
+  background: #f8f5f0;
+  color: #c9793f;
+  border: 1px solid #d8d0c4;
   border-radius: 21px;
   padding: 10px 20px;
   font-family: inherit;
@@ -72,7 +78,8 @@ button {
   margin-right: 8px;
 }
 button:disabled { opacity: 0.4; cursor: not-allowed; }
-button:focus-visible { outline: 2px solid #e8a13d; }
+button:focus-visible { outline: 2px solid #c9793f; }
+button:not(:disabled):hover { background: #f2ede6; }
 
 #imageStage {
   position: relative;
@@ -95,8 +102,8 @@ button:focus-visible { outline: 2px solid #e8a13d; }
   padding: 0;
 }
 #panelList li {
-  background: #1a1a1a;
-  border: 1px solid #3a3428;
+  background: #f8f5f0;
+  border: 1px solid #e2dcd2;
   border-radius: 6px;
   padding: 10px 14px;
   margin-bottom: 8px;
@@ -105,13 +112,13 @@ button:focus-visible { outline: 2px solid #e8a13d; }
   gap: 10px;
 }
 #panelList .panel-order {
-  color: #e8a13d;
+  color: #c9793f;
   font-weight: bold;
   min-width: 1.5em;
 }
 #panelList .panel-desc {
   flex: 1;
-  color: #d8d2c4;
+  color: #4a4339;
   font-size: 13px;
   line-height: 1.4;
 }
@@ -125,10 +132,10 @@ button:focus-visible { outline: 2px solid #e8a13d; }
 #accessibilityReport {
   margin-top: 24px;
   padding-top: 16px;
-  border-top: 1px dashed #3a3428;
+  border-top: 1px dashed #e2dcd2;
 }
 #accessibilityReport h3 {
-  color: #e8a13d;
+  color: #c9793f;
   font-size: 15px;
   margin: 0 0 4px;
 }
@@ -138,12 +145,12 @@ button:focus-visible { outline: 2px solid #e8a13d; }
   padding: 0;
 }
 #accessibilityFindings li {
-  background: #1a1a1a;
-  border: 1px solid #3a3428;
+  background: #f8f5f0;
+  border: 1px solid #e2dcd2;
   border-radius: 6px;
   padding: 8px 12px;
   margin-bottom: 6px;
-  color: #d8d2c4;
+  color: #4a4339;
   font-size: 13px;
   line-height: 1.4;
 }
@@ -154,7 +161,7 @@ button:focus-visible { outline: 2px solid #e8a13d; }
   display: block;
   max-width: 100%;
   border-radius: 4px;
-  border: 1px solid #3a3428;
+  border: 1px solid #e2dcd2;
 }
 #highContrastResult .hint { margin-top: 6px; }
 
@@ -166,17 +173,17 @@ button:focus-visible { outline: 2px solid #e8a13d; }
 #transcript li {
   padding: 8px 10px;
   border-left: 3px solid transparent;
-  color: #a89f8c;
+  color: #5c554a;
   font-size: 14px;
   line-height: 1.5;
 }
 #transcript li.active {
-  border-left-color: #e8a13d;
-  color: #f0ece2;
-  background: #1a1a1a;
+  border-left-color: #c9793f;
+  color: #241f1a;
+  background: #f8f5f0;
 }
 #transcript .speaker {
-  color: #e8a13d;
+  color: #c9793f;
   font-weight: bold;
   margin-right: 6px;
 }

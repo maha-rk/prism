@@ -4,91 +4,243 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prism</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
-    :root { color-scheme: dark; }
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-      background: #0e0e12;
-      color: #f2f2f5;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #f2ede6;
+      color: #241f1a;
       min-height: 100vh;
-      padding: 2rem 1rem;
+      padding: 2rem clamp(1.25rem, 5vw, 3.5rem) 3rem;
     }
-    h1 { margin-bottom: 0.25rem; }
-    .tagline { color: #b7b7c0; margin: 0; }
-    .mission { color: #8a8a93; font-size: 0.9rem; margin-top: 0.25rem; }
-    nav { display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem; width: min(100%, 32rem); }
-    a.mode-card {
-      display: block;
-      padding: 1rem 1.25rem;
-      border: 1px solid #3a3a42;
-      border-radius: 8px;
-      color: inherit;
-      text-decoration: none;
-      background: #1a1a20;
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
-    a.mode-card:hover, a.mode-card:focus-visible { border-color: #f0904a; outline: none; }
-    a.mode-card h2 { margin: 0 0 0.35rem; font-size: 1.1rem; }
-    a.mode-card p { margin: 0; color: #b7b7c0; font-size: 0.9rem; }
-    .access-mode {
-      margin-top: 1.75rem;
-      width: min(100%, 32rem);
-      text-align: left;
+    .logo { display: flex; align-items: center; gap: 0.6rem; font-weight: 600; letter-spacing: 0.15em; font-size: 1rem; }
+    .logo svg { width: 22px; height: 22px; flex-shrink: 0; }
+    .layout {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: clamp(2.5rem, 5vw, 5rem);
+      align-items: center;
+      max-width: 1500px;
+      width: 100%;
+      margin: 0 auto;
     }
-    .access-mode label { font-size: 0.85rem; color: #b7b7c0; display: block; margin-bottom: 0.35rem; }
+    .accent-line { width: 48px; height: 2px; background: #241f1a; margin-bottom: 1.5rem; }
+    h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-weight: 500;
+      font-size: clamp(2.4rem, 5vw, 4.2rem);
+      line-height: 1.15;
+      margin: 0 0 1.25rem;
+    }
+    .tagline { font-size: clamp(1.05rem, 1.3vw, 1.3rem); color: #4a4339; margin: 0 0 2.25rem; max-width: 32rem; }
+    .illustration { display: block; width: 100%; max-width: 600px; height: auto; margin: 0.5rem 0 2rem; }
+    .caption {
+      border-left: 2px solid #d8d0c4;
+      padding-left: 1.25rem;
+      color: #5c554a;
+      font-size: clamp(0.95rem, 1.1vw, 1.1rem);
+      line-height: 1.6;
+      max-width: 420px;
+    }
+    .caption strong { color: #241f1a; }
+    .access-mode label { font-size: 1rem; color: #4a4339; display: block; margin-bottom: 0.6rem; }
     .access-mode select {
-      background: #1a1a20;
-      color: #f2f2f5;
-      border: 1px solid #3a3a42;
-      border-radius: 6px;
-      padding: 0.5rem 0.6rem;
-      font-size: 0.9rem;
+      width: 100%;
+      background: #f8f5f0;
+      color: #241f1a;
+      border: 1px solid #d8d0c4;
+      border-radius: 8px;
+      padding: 0.9rem 1.1rem;
+      font-size: 1.02rem;
       font-family: inherit;
     }
-    .access-mode select:focus-visible { outline: 2px solid #f0904a; }
-    .access-mode .hint { color: #8a8a93; font-size: 0.8rem; margin-top: 0.4rem; }
+    .access-mode select:focus-visible { outline: 2px solid #8b7bb0; }
+    .access-mode .hint { color: #5c554a; font-size: 0.85rem; margin-top: 0.6rem; }
+    nav { display: flex; flex-direction: column; gap: 1.25rem; margin-top: 2.5rem; }
+    a.mode-card {
+      display: flex;
+      align-items: center;
+      gap: 1.3rem;
+      padding: 1.6rem 1.8rem;
+      border: 1px solid #e2dcd2;
+      border-left: 3px solid var(--accent);
+      border-radius: 10px;
+      background: #f8f5f0;
+      color: inherit;
+      text-decoration: none;
+      transition: box-shadow 0.15s ease, transform 0.15s ease;
+    }
+    a.mode-card:hover, a.mode-card:focus-visible {
+      box-shadow: 0 2px 14px rgba(36, 31, 26, 0.08);
+      transform: translateY(-1px);
+      outline: none;
+    }
+    .mode-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #f2ede6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--accent);
+    }
+    .mode-icon svg { width: 26px; height: 26px; }
+    a.mode-card .mode-text { flex: 1; min-width: 0; }
+    a.mode-card h2 { font-family: 'Playfair Display', Georgia, serif; font-weight: 500; margin: 0 0 0.3rem; font-size: 1.3rem; }
+    a.mode-card p { margin: 0; color: #5a5349; font-size: 0.98rem; line-height: 1.45; }
+    .mode-arrow { color: #a89f8c; flex-shrink: 0; }
+    .mode-arrow svg { width: 20px; height: 20px; }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      h1 { font-size: 2.1rem; }
+      .illustration { max-width: 360px; }
+    }
   </style>
   <link rel="stylesheet" href="src/shared/accessProfile.css" />
 </head>
 <body>
-  <h1>Prism</h1>
-  <p class="tagline">One story. Infinite ways to experience it.</p>
-  <p class="mission">Every story deserves every audience.</p>
-
-  <div class="access-mode">
-    <label for="accessProfileSelect">Experiencing this as:</label>
-    <select id="accessProfileSelect">
-      <option value="none">No preference</option>
-      <option value="blind">Blind</option>
-      <option value="low-vision">Low vision</option>
-      <option value="dyslexic">Dyslexic</option>
-      <option value="deaf">Deaf / hard of hearing</option>
-      <option value="motor">Motor impaired</option>
-    </select>
-    <p class="hint">Adapts text size, contrast, spacing, and focus behavior across every mode. Saved on this device only.</p>
+  <div class="topbar">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3 L21 19 L3 19 Z" stroke-linejoin="round"/></svg>
+      PRISM
+    </div>
   </div>
 
-  <nav aria-label="Prism feature modes">
-    <a class="mode-card" href="src/modes/gesture-vision/index.html">
-      <h2>Gesture Vision</h2>
-      <p>Make music with hand gestures — no screen required.</p>
-    </a>
-    <a class="mode-card" href="src/modes/see-through-sound/index.html">
-      <h2>See Through Sound</h2>
-      <p>Comics and manga become immersive audio stories.</p>
-    </a>
-    <a class="mode-card" href="src/modes/emotion-lens/index.html">
-      <h2>Emotion Lens</h2>
-      <p>Ask about the emotional and narrative layer of a story.</p>
-    </a>
-    <a class="mode-card" href="src/modes/synesthesia-studio/index.html">
-      <h2>Synesthesia Studio</h2>
-      <p>Translate one sense into another — image to illustration, image to soundscape, mood to soundscape.</p>
-    </a>
-  </nav>
+  <div class="layout">
+    <div>
+      <div class="accent-line"></div>
+      <h1>One story.<br />Infinite ways<br />to experience it.</h1>
+      <p class="tagline">Every story deserves every audience.</p>
+
+      <svg class="illustration" viewBox="0 0 480 280" fill="none" role="img" aria-label="A folded-paper prism splitting a beam of light into four rays, each ending in an icon representing touch, hearing, emotion, and sound.">
+        <defs>
+          <filter id="prismShadowBlur" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" />
+          </filter>
+        </defs>
+
+        <ellipse cx="185" cy="243" rx="110" ry="12" fill="#241f1a" opacity="0.16" filter="url(#prismShadowBlur)" />
+
+        <line x1="0" y1="160" x2="130" y2="160" stroke="#c9c2b3" stroke-width="1.5" />
+
+        <!-- front-left face: brightest, catches the light directly -->
+        <polygon points="130,90 130,225 235,160" fill="#fdfcfa" stroke="#241f1a" stroke-width="1.5" stroke-linejoin="round" />
+        <!-- top-right face: mid tone -->
+        <polygon points="130,90 235,160 340,120 245,58" fill="#cdc6b8" stroke="#241f1a" stroke-width="1.5" stroke-linejoin="round" />
+        <!-- bottom face: darkest, in shadow -->
+        <polygon points="130,225 235,160 340,120 235,205" fill="#9b9384" stroke="#241f1a" stroke-width="1.5" stroke-linejoin="round" />
+
+        <line x1="235" y1="160" x2="415" y2="68" stroke="#c2bbac" stroke-width="1.25" />
+        <line x1="235" y1="160" x2="415" y2="129" stroke="#c2bbac" stroke-width="1.25" />
+        <line x1="235" y1="160" x2="415" y2="191" stroke="#c2bbac" stroke-width="1.25" />
+        <line x1="235" y1="160" x2="415" y2="252" stroke="#c2bbac" stroke-width="1.25" />
+
+        <g transform="translate(428,68)" stroke="#3a352c" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2" />
+          <path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2" />
+          <path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8" />
+          <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
+        </g>
+        <g transform="translate(428,129)" stroke="#3a352c" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a3.5 3.5 0 1 1-7 0" />
+          <path d="M15 8.5a2.5 2.5 0 0 0-5 0v1a2 2 0 1 1 0 4" />
+        </g>
+        <g transform="translate(428,191)" stroke="#3a352c" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" />
+        </g>
+        <g transform="translate(428,252)" stroke="#3a352c" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 13a2 2 0 0 0 2-2V7a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0V4a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0v-4a2 2 0 0 1 2-2" />
+        </g>
+      </svg>
+
+      <p class="caption">Prism transforms stories across senses so <strong>no one</strong> misses the meaning.</p>
+    </div>
+
+    <div>
+      <div class="access-mode">
+        <label for="accessProfileSelect">I want to experience this as:</label>
+        <select id="accessProfileSelect">
+          <option value="none">No preference</option>
+          <option value="blind">Blind</option>
+          <option value="low-vision">Low vision</option>
+          <option value="dyslexic">Dyslexic</option>
+          <option value="deaf">Deaf / hard of hearing</option>
+          <option value="motor">Motor impaired</option>
+        </select>
+        <p class="hint">Your preference helps us tailor the experience. This setting is saved on your device.</p>
+      </div>
+
+      <nav aria-label="Prism feature modes">
+        <a class="mode-card" style="--accent:#5b6b8c" href="src/modes/gesture-vision/index.html">
+          <span class="mode-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2" />
+              <path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2" />
+              <path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8" />
+              <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
+            </svg>
+          </span>
+          <span class="mode-text">
+            <h2>Gesture Vision</h2>
+            <p>Make music with hand gestures — no screen required.</p>
+          </span>
+          <span class="mode-arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></span>
+        </a>
+        <a class="mode-card" style="--accent:#c9793f" href="src/modes/see-through-sound/index.html">
+          <span class="mode-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a3.5 3.5 0 1 1-7 0" />
+              <path d="M15 8.5a2.5 2.5 0 0 0-5 0v1a2 2 0 1 1 0 4" />
+            </svg>
+          </span>
+          <span class="mode-text">
+            <h2>See Through Sound</h2>
+            <p>Comics and manga become immersive audio stories.</p>
+          </span>
+          <span class="mode-arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></span>
+        </a>
+        <a class="mode-card" style="--accent:#8b7bb0" href="src/modes/emotion-lens/index.html">
+          <span class="mode-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" />
+            </svg>
+          </span>
+          <span class="mode-text">
+            <h2>Emotion Lens</h2>
+            <p>Ask about the emotional and narrative layer of a story.</p>
+          </span>
+          <span class="mode-arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></span>
+        </a>
+        <a class="mode-card" style="--accent:#6b8f6f" href="src/modes/synesthesia-studio/index.html">
+          <span class="mode-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M2 13a2 2 0 0 0 2-2V7a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0V4a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0v-4a2 2 0 0 1 2-2" />
+            </svg>
+          </span>
+          <span class="mode-text">
+            <h2>Synesthesia Studio</h2>
+            <p>Translate one sense into another — image to illustration, image to soundscape, mood to soundscape.</p>
+          </span>
+          <span class="mode-arrow" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></span>
+        </a>
+      </nav>
+    </div>
+  </div>
 
   <script type="module">
     import { getAccessProfile, setAccessProfile, applyAccessProfile } from './src/shared/accessProfile.js';

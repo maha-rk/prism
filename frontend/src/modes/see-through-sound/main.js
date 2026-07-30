@@ -66,9 +66,9 @@ function drawPanelOverlay() {
   resizeOverlay();
   const ctx = panelOverlay.getContext('2d');
   ctx.clearRect(0, 0, panelOverlay.width, panelOverlay.height);
-  ctx.strokeStyle = '#e8a13d';
+  ctx.strokeStyle = '#c9793f';
   ctx.lineWidth = 2;
-  ctx.font = 'bold 16px monospace';
+  ctx.font = 'bold 16px Inter, sans-serif';
 
   orderedPanels.forEach((panel, i) => {
     const { x, y, w, h } = panel.bbox;
@@ -77,7 +77,7 @@ function drawPanelOverlay() {
     const pw = w * panelOverlay.width;
     const ph = h * panelOverlay.height;
     ctx.strokeRect(px, py, pw, ph);
-    ctx.fillStyle = '#e8a13d';
+    ctx.fillStyle = '#c9793f';
     ctx.fillRect(px, py, 26, 22);
     ctx.fillStyle = '#111';
     ctx.fillText(String(i + 1), px + 7, py + 16);

@@ -39,4 +39,19 @@ test.describe('Creative Access Mode', () => {
     await expect(page.locator('body')).toHaveClass(/access-none/);
     await expect(page.locator('#accessProfileSelect')).toHaveValue('none');
   });
+
+  test('dyslexic profile switches headings to sans-serif too, not just body text', async ({ page }) => {
+    // Regression test: headings set their own explicit font-family in each
+    // page's stylesheet, so a naive `body.access-dyslexic { font-family: ... }`
+    // rule (even with !important) doesn't reach them -- an element's own
+    // explicit declaration always wins over an inherited value. Caught by
+    // manual verification, not by an earlier version of this suite.
+    await page.goto('/index.html', { waitUntil: 'networkidle' });
+    await page.selectOption('#accessProfileSelect', 'dyslexic');
+
+    const h1Font = await page.locator('h1').evaluate((el) => getComputedStyle(el).fontFamily);
+    const cardH2Font = await page.locator('a.mode-card h2').first().evaluate((el) => getComputedStyle(el).fontFamily);
+    expect(h1Font).toContain('Verdana');
+    expect(cardH2Font).toContain('Verdana');
+  });
 });
