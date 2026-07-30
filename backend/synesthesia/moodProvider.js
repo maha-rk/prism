@@ -7,9 +7,10 @@
 
 const { callWatsonxVision } = require('../vision/visionProvider');
 const { callGeminiVision, callGeminiText } = require('../shared/geminiClient');
+const { callLocalVision, callLocalText } = require('../shared/localClient');
 const { getIamToken } = require('../vision/iamAuth');
 const { cached, cacheKeyFor } = require('../shared/diskCache');
-const { cascade } = require('../shared/cascade');
+const { cascade, orderedCascadeSteps, REAL_PROVIDERS } = require('../shared/cascade');
 const path = require('path');
 
 const MOOD_CACHE_DIR = path.join(__dirname, '.cache');
@@ -75,16 +76,24 @@ async function geminiMoodFromImage(imageBase64) {
   const text = await callGeminiVision(imageBase64, buildImagePrompt());
   return validateMood(extractJson(text));
 }
+async function localMoodFromImage(imageBase64) {
+  const text = await callLocalVision(imageBase64, buildImagePrompt());
+  return validateMood(extractJson(text));
+}
 
 async function moodFromImage(imageBase64) {
   const provider = process.env.VISION_PROVIDER || 'mock';
-  if (provider !== 'watsonx' && provider !== 'gemini') return mockMood();
+  if (!REAL_PROVIDERS.includes(provider)) return mockMood();
 
   const key = cacheKeyFor(imageBase64, 'mood-image', 'cascade');
   return cached(MOOD_CACHE_DIR, key, () =>
-    provider === 'gemini'
-      ? cascade('gemini', () => geminiMoodFromImage(imageBase64), 'watsonx', () => watsonxMoodFromImage(imageBase64))
-      : cascade('watsonx', () => watsonxMoodFromImage(imageBase64), 'gemini', () => geminiMoodFromImage(imageBase64))
+    cascade(
+      orderedCascadeSteps(provider, {
+        watsonx: () => watsonxMoodFromImage(imageBase64),
+        gemini: () => geminiMoodFromImage(imageBase64),
+        local: () => localMoodFromImage(imageBase64),
+      })
+    )
   );
 }
 
@@ -116,17 +125,25 @@ async function geminiMoodFromText(text) {
   const responseText = await callGeminiText(buildTextPrompt(text));
   return validateMood(extractJson(responseText));
 }
+async function localMoodFromText(text) {
+  const responseText = await callLocalText(buildTextPrompt(text));
+  return validateMood(extractJson(responseText));
+}
 
 async function moodFromText(text) {
   const provider = process.env.VISION_PROVIDER || 'mock';
-  if (provider !== 'watsonx' && provider !== 'gemini') return mockMood();
+  if (!REAL_PROVIDERS.includes(provider)) return mockMood();
 
   const key = cacheKeyFor(text, 'mood-text', 'cascade');
   return cached(MOOD_CACHE_DIR, key, () =>
-    provider === 'gemini'
-      ? cascade('gemini', () => geminiMoodFromText(text), 'watsonx', () => watsonxMoodFromText(text))
-      : cascade('watsonx', () => watsonxMoodFromText(text), 'gemini', () => geminiMoodFromText(text))
+    cascade(
+      orderedCascadeSteps(provider, {
+        watsonx: () => watsonxMoodFromText(text),
+        gemini: () => geminiMoodFromText(text),
+        local: () => localMoodFromText(text),
+      })
+    )
   );
 }
 
-module.exports = { moodFromImage, moodFromText, mockMood };
+module.exports = { moodFromImage, moodFromText, mockMood, validateMood, clamp01, extractJson };

@@ -9,7 +9,7 @@
 const path = require('path');
 const { getIamToken } = require('../vision/iamAuth');
 const { cached, cacheKeyFor } = require('../shared/diskCache');
-const { cascade } = require('../shared/cascade');
+const { cascade, orderedCascadeSteps, REAL_PROVIDERS } = require('../shared/cascade');
 const CHARACTER_SHEET_CACHE_DIR = path.join(__dirname, '.cache');
 
 function mockCharacterSheet(panels) {
@@ -80,15 +80,26 @@ async function geminiCharacterSheet(storyBible) {
   return extractJson(text);
 }
 
+/** Local provider: Ollama (llama3.2:1b by default) — no key, no quota. */
+async function localCharacterSheet(storyBible) {
+  const { callLocalText } = require('../shared/localClient');
+  const text = await callLocalText(buildPrompt(storyBible));
+  return extractJson(text);
+}
+
 async function buildCharacterSheet(storyBible, panels) {
   const provider = process.env.VISION_PROVIDER || 'mock';
-  if (provider === 'watsonx' || provider === 'gemini') {
+  if (REAL_PROVIDERS.includes(provider)) {
     try {
       const key = cacheKeyFor(storyBible, 'cascade');
       return await cached(CHARACTER_SHEET_CACHE_DIR, key, () =>
-        provider === 'gemini'
-          ? cascade('gemini', () => geminiCharacterSheet(storyBible), 'watsonx', () => watsonxCharacterSheet(storyBible))
-          : cascade('watsonx', () => watsonxCharacterSheet(storyBible), 'gemini', () => geminiCharacterSheet(storyBible))
+        cascade(
+          orderedCascadeSteps(provider, {
+            watsonx: () => watsonxCharacterSheet(storyBible),
+            gemini: () => geminiCharacterSheet(storyBible),
+            local: () => localCharacterSheet(storyBible),
+          })
+        )
       );
     } catch (err) {
       console.error('[imageGen] character sheet extraction failed, using mock fallback:', err.message);

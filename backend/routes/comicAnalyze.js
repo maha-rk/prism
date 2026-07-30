@@ -2,6 +2,8 @@ const express = require('express');
 const { retrieveGuidelines } = require('../rag/retrieve');
 const { analyzeComicPage, mockAnalyzeComicPage } = require('../vision/visionProvider');
 const { SFX_VOCABULARY } = require('../sfx/sfxVocabulary');
+const { computeAccessibilityReport } = require('../accessibility/contrastChecker');
+const { REAL_PROVIDERS } = require('../shared/cascade');
 
 const router = express.Router();
 
@@ -59,12 +61,28 @@ router.post('/', async (req, res) => {
 
   try {
     const result = await analyzeComicPage(imageBase64, buildPrompt());
-    res.json({ ...result, usedMock: false });
+    // Accessibility report only computed when a real vision provider was
+    // actually configured and used — NOT just "no error was thrown."
+    // VISION_PROVIDER unset/mock returns the fixed mock story via a plain
+    // return, not a throw, so relying on try/catch alone would still
+    // compute real pixel math against the mock's generic, fictional
+    // bounding boxes — real math applied to meaningless regions, which is
+    // worse than not showing a report at all.
+    const usedRealProvider = REAL_PROVIDERS.includes(process.env.VISION_PROVIDER || 'mock');
+    let accessibility = null;
+    if (usedRealProvider) {
+      try {
+        accessibility = await computeAccessibilityReport(imageBase64, result.panels);
+      } catch (accessErr) {
+        console.error('[/comic/analyze] accessibility report failed (non-fatal):', accessErr.message);
+      }
+    }
+    res.json({ ...result, usedMock: false, accessibility });
   } catch (err) {
     console.error('[/comic/analyze] vision provider failed, falling back to mock:', err.message);
     // usedMock/mockReason surfaced to the frontend so a real failure never
     // silently looks like a real (but wrong) analysis of the uploaded page.
-    res.json({ ...mockAnalyzeComicPage(), usedMock: true, mockReason: err.message });
+    res.json({ ...mockAnalyzeComicPage(), usedMock: true, mockReason: err.message, accessibility: null });
   }
 });
 

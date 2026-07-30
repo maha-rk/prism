@@ -8,3 +8,5 @@ backend/narration/.cache/
 backend/imageGen/.cache/
 backend/emotionLens/.cache/
 backend/synesthesia/.cache/
+e2e/test-results/
+e2e/playwright-report/

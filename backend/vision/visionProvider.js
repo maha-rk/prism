@@ -317,27 +317,52 @@ async function geminiAnalyzeComicPage(imageBase64, prompt) {
   return analyzeWithRetryAndFallback(callGeminiVision, imageBase64, prompt);
 }
 
+/** Local provider: Ollama running moondream (or whatever LOCAL_VISION_MODEL
+ * is set to) on localhost — no API key, no quota, genuinely offline. The
+ * weakest of the three vision models in practice, but it's the one rung
+ * that can never run out mid-demo, so it's a real safety net, not just a
+ * checkbox. */
+async function localAnalyzeComicPage(imageBase64, prompt) {
+  const { callLocalVision } = require('../shared/localClient');
+  return analyzeWithRetryAndFallback(callLocalVision, imageBase64, prompt);
+}
+
 const path = require('path');
 const { cached, cacheKeyFor } = require('../shared/diskCache');
-const { cascade } = require('../shared/cascade');
+const { cascade, orderedCascadeSteps, REAL_PROVIDERS } = require('../shared/cascade');
 const ANALYZE_CACHE_DIR = path.join(__dirname, '.analyzeCache');
 
 async function analyzeComicPage(imageBase64, prompt) {
   const provider = process.env.VISION_PROVIDER || 'mock';
-  if (provider !== 'watsonx' && provider !== 'gemini') {
+  if (!REAL_PROVIDERS.includes(provider)) {
     return mockAnalyzeComicPage();
   }
 
   // Whichever provider is configured as primary is tried first (watsonx by
-  // default, to maximize real IBM usage); the other real provider is an
-  // automatic fallback instead of dropping straight to the mock story —
-  // including if watsonx's Lite-plan quota runs out mid-demo.
+  // default, to maximize real IBM usage); the other real providers are
+  // automatic fallbacks instead of dropping straight to the mock story —
+  // including if watsonx's Lite-plan quota runs out mid-demo, or Gemini's
+  // free-tier daily cap is hit. `local` (Ollama) is always the last real
+  // rung tried, since it needs no key and can't run out of quota.
   const key = cacheKeyFor(imageBase64, prompt, 'cascade');
   return cached(ANALYZE_CACHE_DIR, key, () =>
-    provider === 'gemini'
-      ? cascade('gemini', () => geminiAnalyzeComicPage(imageBase64, prompt), 'watsonx', () => watsonxAnalyzeComicPage(imageBase64, prompt))
-      : cascade('watsonx', () => watsonxAnalyzeComicPage(imageBase64, prompt), 'gemini', () => geminiAnalyzeComicPage(imageBase64, prompt))
+    cascade(
+      orderedCascadeSteps(provider, {
+        watsonx: () => watsonxAnalyzeComicPage(imageBase64, prompt),
+        gemini: () => geminiAnalyzeComicPage(imageBase64, prompt),
+        local: () => localAnalyzeComicPage(imageBase64, prompt),
+      })
+    )
   );
 }
 
-module.exports = { analyzeComicPage, mockAnalyzeComicPage, callWatsonxVision, analyzeWithRetryAndFallback };
+module.exports = {
+  analyzeComicPage,
+  mockAnalyzeComicPage,
+  callWatsonxVision,
+  analyzeWithRetryAndFallback,
+  extractJson,
+  validateShape,
+  parseMarkdownFallback,
+  normalizeSfx,
+};

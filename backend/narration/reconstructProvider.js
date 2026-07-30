@@ -13,7 +13,7 @@
 const path = require('path');
 const { getIamToken } = require('../vision/iamAuth');
 const { cached, cacheKeyFor } = require('../shared/diskCache');
-const { cascade } = require('../shared/cascade');
+const { cascade, orderedCascadeSteps, REAL_PROVIDERS } = require('../shared/cascade');
 const RECONSTRUCT_CACHE_DIR = path.join(__dirname, '.cache');
 
 const CONNECTIVES = ['Moments later,', 'Then,', 'Without warning,', 'Across the scene,', 'Just after,'];
@@ -110,16 +110,27 @@ async function geminiReconstructNarrative(panels) {
   return applyReconstruction(panels, text);
 }
 
+/** Local provider: Ollama (llama3.2:1b by default) — no key, no quota. */
+async function localReconstructNarrative(panels) {
+  const { callLocalText } = require('../shared/localClient');
+  const text = await callLocalText(buildPrompt(panels));
+  return applyReconstruction(panels, text);
+}
+
 async function reconstructNarrative(panels) {
   const provider = process.env.VISION_PROVIDER || 'mock';
-  if (provider !== 'watsonx' && provider !== 'gemini') {
+  if (!REAL_PROVIDERS.includes(provider)) {
     return mockReconstructNarrative(panels);
   }
   const key = cacheKeyFor(JSON.stringify(panels), 'cascade');
   return cached(RECONSTRUCT_CACHE_DIR, key, () =>
-    provider === 'gemini'
-      ? cascade('gemini', () => geminiReconstructNarrative(panels), 'watsonx', () => watsonxReconstructNarrative(panels))
-      : cascade('watsonx', () => watsonxReconstructNarrative(panels), 'gemini', () => geminiReconstructNarrative(panels))
+    cascade(
+      orderedCascadeSteps(provider, {
+        watsonx: () => watsonxReconstructNarrative(panels),
+        gemini: () => geminiReconstructNarrative(panels),
+        local: () => localReconstructNarrative(panels),
+      })
+    )
   );
 }
 

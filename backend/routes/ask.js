@@ -16,11 +16,11 @@ router.post('/', async (req, res) => {
   const storyBible = buildStoryBible(panels);
 
   try {
-    const answer = await answerQuestion(storyBible, question);
-    res.json({ answer, usedMock: false });
+    const { answer, citationWarning } = await answerQuestion(storyBible, question);
+    res.json({ answer, usedMock: false, citationWarning });
   } catch (err) {
     console.error('[/comic/ask] Q&A provider failed, falling back to mock:', err.message);
-    res.json({ answer: mockAnswer(storyBible, question), usedMock: true, mockReason: err.message });
+    res.json({ answer: mockAnswer(storyBible, question), usedMock: true, mockReason: err.message, citationWarning: false });
   }
 });
 

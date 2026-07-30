@@ -154,6 +154,65 @@ function streamToBuffer(stream) {
   });
 }
 
+// Local, zero-cost, zero-quota TTS via macOS's built-in `say` — the same
+// "always available, never runs out" rung the other providers get from
+// Ollama (see shared/localClient.js). Voice variety comes from picking
+// different named system voices per slot; emotion drives speaking rate,
+// reusing PROSODY_BY_EMOTION's own `rate` percentage as the single source
+// of truth rather than a second, duplicate emotion table. Honest
+// limitation: unlike Watson's SSML, `say` has no reliable cross-voice pitch
+// control, so build-based pitch (PROSODY_BY_BUILD) doesn't carry over
+// locally — only the emotion-driven rate does.
+const LOCAL_VOICE_TABLE = {
+  narrator: 'Daniel',
+  'voice-1': 'Samantha',
+  'voice-2': 'Fred',
+  'voice-3': 'Reed (English (US))',
+  'voice-4': 'Kathy',
+};
+const LOCAL_BASE_RATE_WPM = 180;
+
+function localRateFor(emotion) {
+  const prosody = PROSODY_BY_EMOTION[(emotion || '').toLowerCase()] || {};
+  const pct = prosody.rate ? parseFloat(prosody.rate) / 100 : 0;
+  return Math.max(80, Math.round(LOCAL_BASE_RATE_WPM * (1 + pct)));
+}
+
+// `say` doesn't understand SSML breaks — approximate the same "audible
+// pause on comic-lettering dashes" intent with a comma, which reliably
+// triggers a brief pause in speech synthesis.
+function insertPlainPauses(text) {
+  return text.replace(/-{2,}/g, ', ');
+}
+
+async function localSynthesize(text, voiceSlot, emotion) {
+  if (process.platform !== 'darwin') {
+    throw new Error('local TTS ("say") is only available on macOS');
+  }
+  const { execFile } = require('child_process');
+  const os = require('os');
+  const crypto = require('crypto');
+
+  const voice = LOCAL_VOICE_TABLE[voiceSlot] || LOCAL_VOICE_TABLE.narrator;
+  const rate = localRateFor(emotion);
+  const plainText = insertPlainPauses(text);
+  const outPath = path.join(os.tmpdir(), `prism-local-tts-${crypto.randomUUID()}.wav`);
+
+  await new Promise((resolve, reject) => {
+    execFile(
+      'say',
+      ['-v', voice, '-r', String(rate), '-o', outPath, '--data-format=LEI16@22050', plainText],
+      (err, stdout, stderr) => (err ? reject(new Error(`local "say" failed: ${err.message} ${stderr || ''}`)) : resolve())
+    );
+  });
+
+  try {
+    return await fs.promises.readFile(outPath);
+  } finally {
+    fs.promises.unlink(outPath).catch(() => {});
+  }
+}
+
 // Disk-persisted cache — the real Watson provider is metered (10,000
 // chars/month on the Lite plan). Persisting to disk (not just in-memory)
 // means once a line has genuinely been paid for, it's never re-synthesized
@@ -164,15 +223,22 @@ function streamToBuffer(stream) {
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { cascade } = require('../shared/cascade');
 
 const CACHE_DIR = path.join(__dirname, '.cache');
 
-function cacheKey(text, voiceSlot, emotion, build) {
-  // Keyed by the actual underlying Watson voice ID, not just the slot name —
-  // otherwise changing VOICE_TABLE's mapping (as happened once already)
-  // would silently serve stale audio synthesized with the wrong voice.
+function cacheKey(text, voiceSlot, emotion, build, provider) {
+  // Keyed by the actual underlying voice identity for both providers (not
+  // just the slot name) plus which provider was primary — otherwise
+  // changing VOICE_TABLE's mapping (as happened once already), or toggling
+  // TTS_PROVIDER between watson/local, would silently serve stale audio
+  // synthesized with the wrong voice or engine.
   const watsonVoice = VOICE_TABLE[voiceSlot] || VOICE_TABLE.narrator;
-  return crypto.createHash('sha256').update(`${watsonVoice}::${emotion}::${build}::${text}`).digest('hex');
+  const localVoice = LOCAL_VOICE_TABLE[voiceSlot] || LOCAL_VOICE_TABLE.narrator;
+  return crypto
+    .createHash('sha256')
+    .update(`${provider}::${watsonVoice}::${localVoice}::${emotion}::${build}::${text}`)
+    .digest('hex');
 }
 
 function cachePath(key) {
@@ -181,20 +247,34 @@ function cachePath(key) {
 
 async function synthesize(text, voiceSlot, emotion, build = 'average') {
   const provider = process.env.TTS_PROVIDER || 'mock';
-  if (provider !== 'watson') {
+  if (provider !== 'watson' && provider !== 'local') {
     return mockSynthesize(text);
   }
 
-  const key = cacheKey(text, voiceSlot, emotion, build);
+  const key = cacheKey(text, voiceSlot, emotion, build, provider);
   const filePath = cachePath(key);
   if (fs.existsSync(filePath)) {
     return fs.promises.readFile(filePath);
   }
 
-  const audio = await watsonSynthesize(text, voiceSlot, emotion, build);
+  // Whichever provider is configured as primary is tried first; the other
+  // real provider is an automatic fallback before ever dropping to mock —
+  // same cascade philosophy as every other AI call site in this backend.
+  const steps =
+    provider === 'local'
+      ? [
+          { label: 'local', fn: () => localSynthesize(text, voiceSlot, emotion) },
+          { label: 'watson', fn: () => watsonSynthesize(text, voiceSlot, emotion, build) },
+        ]
+      : [
+          { label: 'watson', fn: () => watsonSynthesize(text, voiceSlot, emotion, build) },
+          { label: 'local', fn: () => localSynthesize(text, voiceSlot, emotion) },
+        ];
+
+  const audio = await cascade(steps);
   await fs.promises.mkdir(CACHE_DIR, { recursive: true });
   await fs.promises.writeFile(filePath, audio);
   return audio;
 }
 
-module.exports = { synthesize, VOICE_TABLE };
+module.exports = { synthesize, VOICE_TABLE, wrapSsml, insertDashBreaks, localRateFor, LOCAL_VOICE_TABLE };
