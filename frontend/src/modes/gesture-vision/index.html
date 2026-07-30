@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Prism — Gesture Vision</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="stage">
+    <video id="webcam" autoplay playsinline muted aria-hidden="true"></video>
+    <canvas id="overlay" class="dimmed" aria-hidden="true"></canvas>
+
+    <div id="modeHeader">
+      <a href="../../../index.html" class="home-link">&larr; Prism</a>
+      <span class="mode-name">Gesture Vision</span>
+    </div>
+
+    <select id="keySelect" aria-label="Key">
+      <option value="261.63" data-note="C" selected>C</option>
+      <option value="277.18" data-note="Db">C#/Db</option>
+      <option value="293.66" data-note="D">D</option>
+      <option value="311.13" data-note="Eb">D#/Eb</option>
+      <option value="329.63" data-note="E">E</option>
+      <option value="349.23" data-note="F">F</option>
+      <option value="369.99" data-note="Gb">F#/Gb</option>
+      <option value="392.00" data-note="G">G</option>
+      <option value="415.30" data-note="Ab">G#/Ab</option>
+      <option value="440.00" data-note="A">A</option>
+      <option value="466.16" data-note="Bb">A#/Bb</option>
+      <option value="493.88" data-note="B">B</option>
+    </select>
+    <select id="toneSelect" aria-label="Tone">
+      <option value="triangle" selected>Warm Synth</option>
+      <option value="sawtooth">Bright Synth</option>
+      <option value="square">Retro Synth</option>
+    </select>
+
+    <div id="volumeMeter" aria-hidden="true">
+      <div class="vol-bar" data-index="7"></div>
+      <div class="vol-bar" data-index="6"></div>
+      <div class="vol-bar" data-index="5"></div>
+      <div class="vol-bar" data-index="4"></div>
+      <div class="vol-bar" data-index="3"></div>
+      <div class="vol-bar" data-index="2"></div>
+      <div class="vol-bar" data-index="1"></div>
+      <div class="vol-bar" data-index="0"></div>
+    </div>
+    <div id="distortionDisplay" aria-hidden="true">Filter: 0%</div>
+
+    <div id="chordDisplay" aria-hidden="true">--</div>
+    <div id="qualityDisplay" aria-hidden="true">--</div>
+
+    <button id="helpButton" type="button" aria-haspopup="dialog" aria-label="Help guide">?</button>
+    <div id="bottomRightControls">
+      <button id="recordBtn" type="button" aria-pressed="false">Record (R)</button>
+      <button id="muteBtn" type="button" aria-pressed="false">Voice lock (M/Space)</button>
+    </div>
+
+    <div id="startOverlay" role="button" tabindex="0">
+      <div class="start-circle" aria-hidden="true">&#9654;</div>
+      <div class="start-text">Click, tap, or press Enter to start your camera and instrument.</div>
+    </div>
+  </div>
+
+  <div id="helpModal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="help-content">
+      <button id="closeHelp" type="button" aria-label="Close help">&#10005;</button>
+      <h2 id="helpTitle">Gesture Vision Guide</h2>
+
+      <h3>Left hand</h3>
+      <p><b>Fingers (scale degree)</b><br>
+      1 &rarr; I &nbsp; 2 &rarr; II &nbsp; 3 &rarr; III &nbsp; 4 &rarr; IV &nbsp; 5 &rarr; V<br>
+      Index + pinky &rarr; VI<br>
+      Index + pinky + thumb &rarr; VII</p>
+      <p><b>Wrist tilt</b><br>
+      Left/right of center &rarr; major/minor (there's a dead zone in the middle)</p>
+
+      <h3>Right hand</h3>
+      <p><b>Fingers (chord quality)</b><br>
+      1 &rarr; root position &nbsp; 2 &rarr; 1st inversion &nbsp; 3 &rarr; 7th &nbsp; 4 &rarr; extended 7th</p>
+      <p><b>Thumb</b><br>
+      Extended &rarr; octave down</p>
+      <p><b>Height</b><br>
+      Higher &rarr; louder</p>
+      <p><b>Tilt</b><br>
+      Left/right &rarr; sweeps the tone filter</p>
+
+      <p>
+        Chord and quality changes are spoken aloud automatically &mdash; that's the one thing you
+        can't infer from the sound alone. Volume and filter are conveyed through the sound itself.
+      </p>
+
+      <h3>Space bar</h3>
+      <p>
+        Press once to lock or unlock the voice (so accidental sounds don't interrupt you mid-performance).<br>
+        Press twice to hear your current key and tone settings, then say a key or tone name to change it &mdash;
+        press twice again to close without changing anything.<br>
+        Press three times to hear this guide read aloud &mdash; press three times again to close it.
+      </p>
+    </div>
+  </div>
+
+  <div id="statusLive" class="sr-only" role="status" aria-live="polite"></div>
+  <div id="alertLive" class="sr-only" role="alert" aria-live="assertive"></div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

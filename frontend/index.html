@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prism</title>
+  <style>
+    :root { color-scheme: dark; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #0e0e12;
+      color: #f2f2f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+    h1 { margin-bottom: 0.25rem; }
+    .tagline { color: #b7b7c0; margin: 0; }
+    .mission { color: #8a8a93; font-size: 0.9rem; margin-top: 0.25rem; }
+    nav { display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem; width: min(100%, 32rem); }
+    a.mode-card {
+      display: block;
+      padding: 1rem 1.25rem;
+      border: 1px solid #3a3a42;
+      border-radius: 8px;
+      color: inherit;
+      text-decoration: none;
+      background: #1a1a20;
+    }
+    a.mode-card:hover, a.mode-card:focus-visible { border-color: #f0904a; outline: none; }
+    a.mode-card h2 { margin: 0 0 0.35rem; font-size: 1.1rem; }
+    a.mode-card p { margin: 0; color: #b7b7c0; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <h1>Prism</h1>
+  <p class="tagline">One story. Infinite ways to experience it.</p>
+  <p class="mission">Every story deserves every audience.</p>
+
+  <nav aria-label="Prism feature modes">
+    <a class="mode-card" href="src/modes/gesture-vision/index.html">
+      <h2>Gesture Vision</h2>
+      <p>Make music with hand gestures — no screen required.</p>
+    </a>
+    <a class="mode-card" href="src/modes/see-through-sound/index.html">
+      <h2>See Through Sound</h2>
+      <p>Comics and manga become immersive audio stories.</p>
+    </a>
+    <a class="mode-card" href="src/modes/emotion-lens/index.html">
+      <h2>Emotion Lens</h2>
+      <p>Ask about the emotional and narrative layer of a story.</p>
+    </a>
+    <a class="mode-card" href="src/modes/synesthesia-studio/index.html">
+      <h2>Synesthesia Studio</h2>
+      <p>Translate one sense into another — image to illustration, image to soundscape, mood to soundscape.</p>
+    </a>
+  </nav>
+</body>
+</html>

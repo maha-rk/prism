@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prism — See Through Sound</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main id="app">
+    <a href="../../../index.html" class="home-link">&larr; Prism</a>
+    <h1>See Through Sound</h1>
+    <p class="intro">
+      Upload a comic or manga page. It's broken into panels with a suggested reading order —
+      fix the order if needed, then it's narrated aloud with distinct character voices, sound
+      cues, and simple left/right positioning.
+    </p>
+
+    <section id="uploadSection">
+      <label for="pageInput" class="upload-label">
+        Choose a comic page image
+        <input type="file" id="pageInput" accept="image/*" />
+      </label>
+      <button id="analyzeBtn" type="button" disabled>Analyze page</button>
+    </section>
+
+    <section id="reviewSection" class="hidden">
+      <h2>Confirm reading order</h2>
+      <p id="mockWarning" class="mock-warning hidden" role="alert"></p>
+      <p class="hint">Detected panels are numbered on the image. Use Move up / Move down on
+        any panel below if the order is wrong, then continue.</p>
+      <div id="imageStage">
+        <img id="pageImage" alt="Uploaded comic page" />
+        <canvas id="panelOverlay" aria-hidden="true"></canvas>
+      </div>
+      <ol id="panelList"></ol>
+      <button id="confirmOrderBtn" type="button">Confirm order and narrate</button>
+      <button id="reanalyzeBtn" type="button">Re-analyze this page</button>
+    </section>
+
+    <section id="narrateSection" class="hidden">
+      <h2>Narration</h2>
+      <p id="narrateMockWarning" class="mock-warning hidden" role="alert"></p>
+      <p id="narrateStatus" role="status">Preparing narration…</p>
+      <div id="playerControls" class="hidden">
+        <button id="playPauseBtn" type="button">Play</button>
+        <button id="restartBtn" type="button">Start over with a new page</button>
+      </div>
+      <ol id="transcript"></ol>
+    </section>
+
+    <div id="statusLive" class="sr-only" role="status" aria-live="polite"></div>
+    <div id="alertLive" class="sr-only" role="alert" aria-live="assertive"></div>
+  </main>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

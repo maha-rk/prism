@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prism — Synesthesia Studio</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main id="app">
+    <a href="../../../index.html" class="home-link">&larr; Prism</a>
+    <h1>Synesthesia Studio</h1>
+    <p class="intro">
+      Translate one sense into another — the same cross-sense idea behind
+      See Through Sound (visual → audio) and Gesture Vision (motion →
+      music), applied more broadly here. Turn an image into a new
+      illustration, an image into a generative soundscape, or a written
+      mood into one.
+    </p>
+
+    <nav class="tabs" aria-label="Synesthesia Studio modes">
+      <button type="button" class="tab-btn active" data-tab="illustration">Image → Illustration</button>
+      <button type="button" class="tab-btn" data-tab="image-sound">Image → Soundscape</button>
+      <button type="button" class="tab-btn" data-tab="text-sound">Text → Soundscape</button>
+    </nav>
+
+    <!-- ===== Image -> Illustration (reuses Creative Content Translator's pipeline) ===== -->
+    <section id="panel-illustration" class="tab-panel">
+      <p class="honesty-note">
+        Character consistency across panels is prompt-based (a shared
+        description reused every time a character appears), not a pixel-
+        perfect guarantee — the same character may look slightly different
+        panel to panel.
+      </p>
+
+      <section id="uploadSection">
+        <label for="pageInput" class="upload-label">
+          Choose a comic page image
+          <input type="file" id="pageInput" accept="image/*" />
+        </label>
+
+        <div class="style-picker">
+          <label for="styleSelect">Art style</label>
+          <select id="styleSelect">
+            <option value="watercolor" selected>Watercolor illustration</option>
+            <option value="manga">Manga (black &amp; white)</option>
+            <option value="storybook">Children's storybook</option>
+            <option value="noir">Noir comic</option>
+            <option value="retro_pulp">Retro pulp comic</option>
+          </select>
+        </div>
+
+        <button id="analyzeBtn" type="button" disabled>Reimagine this page</button>
+        <p id="analyzeStatus" role="status"></p>
+        <p id="mockWarning" class="mock-warning hidden" role="alert"></p>
+      </section>
+
+      <section id="reimagineSection" class="hidden">
+        <p id="reimagineStatus" role="status"></p>
+        <p id="reimagineMockWarning" class="mock-warning hidden" role="alert"></p>
+        <div id="gallery"></div>
+        <button id="regenerateBtn" type="button" class="hidden">Regenerate in a different style</button>
+        <button id="restartBtn" type="button">Start over with a new page</button>
+      </section>
+    </section>
+
+    <!-- ===== Image -> Soundscape ===== -->
+    <section id="panel-image-sound" class="tab-panel hidden">
+      <p class="hint">Upload any image — a photo, painting, or scene — and hear a generative ambient soundscape reflecting its mood.</p>
+      <label for="soundImageInput" class="upload-label">
+        Choose an image
+        <input type="file" id="soundImageInput" accept="image/*" />
+      </label>
+      <button id="imageSoundBtn" type="button" disabled>Generate soundscape</button>
+      <p id="imageSoundStatus" role="status"></p>
+      <p id="imageSoundMockWarning" class="mock-warning hidden" role="alert"></p>
+      <div id="imageSoundControls" class="player-controls hidden">
+        <p id="imageMoodDescription" class="mood-description"></p>
+        <button id="imageSoundPlayBtn" type="button">Play</button>
+        <button id="imageSoundStopBtn" type="button">Stop</button>
+      </div>
+    </section>
+
+    <!-- ===== Text -> Soundscape ===== -->
+    <section id="panel-text-sound" class="tab-panel hidden">
+      <p class="hint">Describe a mood or scene — hear a generative ambient soundscape built from it.</p>
+      <label for="moodTextInput">Mood or scene description</label>
+      <textarea id="moodTextInput" rows="3" placeholder="e.g. A quiet, misty forest at dawn, birds just starting to sing"></textarea>
+      <button id="textSoundBtn" type="button" disabled>Generate soundscape</button>
+      <p id="textSoundStatus" role="status"></p>
+      <p id="textSoundMockWarning" class="mock-warning hidden" role="alert"></p>
+      <div id="textSoundControls" class="player-controls hidden">
+        <p id="textMoodDescription" class="mood-description"></p>
+        <button id="textSoundPlayBtn" type="button">Play</button>
+        <button id="textSoundStopBtn" type="button">Stop</button>
+      </div>
+    </section>
+
+    <div id="statusLive" class="sr-only" role="status" aria-live="polite"></div>
+    <div id="alertLive" class="sr-only" role="alert" aria-live="assertive"></div>
+  </main>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

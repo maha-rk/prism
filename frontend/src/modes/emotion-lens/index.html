@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prism — Emotion Lens</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main id="app">
+    <a href="../../../index.html" class="home-link">&larr; Prism</a>
+    <h1>Emotion Lens</h1>
+    <p class="intro">
+      Upload a comic or manga page, then ask about it — emotional questions
+      ("why is she upset?") or factual ones ("who is the man in blue?").
+      Answers are grounded in what's actually on the page, spoken aloud, and
+      hedge honestly when the page doesn't say enough to be sure.
+    </p>
+
+    <section id="uploadSection">
+      <label for="pageInput" class="upload-label">
+        Choose a comic page image
+        <input type="file" id="pageInput" accept="image/*" />
+      </label>
+      <button id="analyzeBtn" type="button" disabled>Analyze page</button>
+      <p id="analyzeStatus" role="status"></p>
+      <p id="mockWarning" class="mock-warning hidden" role="alert"></p>
+    </section>
+
+    <section id="qaSection" class="hidden">
+      <h2>Ask about this story</h2>
+      <div id="imageStage">
+        <img id="pageImage" alt="Uploaded comic page" />
+      </div>
+      <form id="askForm">
+        <label for="questionInput">Your question</label>
+        <input type="text" id="questionInput" placeholder="e.g. Why is Reyes afraid?" autocomplete="off" />
+        <button id="askBtn" type="submit">Ask</button>
+      </form>
+      <p id="askMockWarning" class="mock-warning hidden" role="alert"></p>
+      <ol id="conversation" aria-label="Conversation history"></ol>
+      <button id="restartBtn" type="button">Start over with a new page</button>
+    </section>
+
+    <div id="statusLive" class="sr-only" role="status" aria-live="polite"></div>
+    <div id="alertLive" class="sr-only" role="alert" aria-live="assertive"></div>
+  </main>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
