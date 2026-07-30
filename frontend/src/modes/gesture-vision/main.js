@@ -87,6 +87,27 @@ function computeCoverRect(srcW, srcH, dstW, dstH) {
   return { sx: 0, sy: (srcH - sHeight) / 2, sWidth, sHeight };
 }
 
+// MediaPipe's standard 21-point hand skeleton topology (wrist=0; each
+// finger a chain from its base knuckle to tip; knuckles 5/9/13/17 also
+// linked to form the palm) -- the same connection set MediaPipe's own
+// drawing_utils uses, reproduced here since we render on a plain 2D canvas
+// instead of their helper.
+const HAND_CONNECTIONS = [
+  [0, 1], [1, 2], [2, 3], [3, 4],
+  [0, 5], [5, 6], [6, 7], [7, 8],
+  [5, 9], [9, 10], [10, 11], [11, 12],
+  [9, 13], [13, 14], [14, 15], [15, 16],
+  [13, 17], [17, 18], [18, 19], [19, 20],
+  [0, 17],
+];
+
+// Left/right get distinct colors -- not just decoration: the two hands
+// control genuinely different things (left = chord/key, right = quality/
+// volume/filter), so color-coding lets a sighted viewer actually read which
+// hand is doing what at a glance, the same way the spoken layer already
+// tells a blind player.
+const HAND_COLOR = { Left: '#8fa8d9', Right: '#e0a86b' };
+
 function drawFrame(result) {
   const srcW = webcam.videoWidth, srcH = webcam.videoHeight;
   if (!srcW || !srcH) return;
@@ -99,16 +120,35 @@ function drawFrame(result) {
   overlayCtx.scale(-1, 1);
   overlayCtx.drawImage(webcam, sx, sy, sWidth, sHeight, 0, 0, canvasWidth, canvasHeight);
 
-  overlayCtx.fillStyle = '#ffffff80';
-  for (const landmarks of result.landmarks) {
-    for (const point of landmarks) {
-      const canvasX = ((point.x * srcW - sx) / sWidth) * canvasWidth;
-      const canvasY = ((point.y * srcH - sy) / sHeight) * canvasHeight;
+  const toCanvasPoint = (point) => ({
+    x: ((point.x * srcW - sx) / sWidth) * canvasWidth,
+    y: ((point.y * srcH - sy) / sHeight) * canvasHeight,
+  });
+
+  result.landmarks.forEach((landmarks, i) => {
+    const handedness = result.handedness?.[i]?.[0]?.categoryName;
+    const color = HAND_COLOR[handedness] || '#ffffff';
+    const points = landmarks.map(toCanvasPoint);
+
+    overlayCtx.strokeStyle = color;
+    overlayCtx.globalAlpha = 0.7;
+    overlayCtx.lineWidth = 2;
+    overlayCtx.lineCap = 'round';
+    for (const [a, b] of HAND_CONNECTIONS) {
       overlayCtx.beginPath();
-      overlayCtx.arc(canvasX, canvasY, 4, 0, Math.PI * 2);
+      overlayCtx.moveTo(points[a].x, points[a].y);
+      overlayCtx.lineTo(points[b].x, points[b].y);
+      overlayCtx.stroke();
+    }
+
+    overlayCtx.globalAlpha = 1;
+    overlayCtx.fillStyle = color;
+    for (const p of points) {
+      overlayCtx.beginPath();
+      overlayCtx.arc(p.x, p.y, 4, 0, Math.PI * 2);
       overlayCtx.fill();
     }
-  }
+  });
   overlayCtx.restore();
 }
 

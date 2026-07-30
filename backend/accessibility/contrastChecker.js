@@ -110,7 +110,7 @@ function structuralIssues(panels) {
 }
 
 const METHODOLOGY_NOTE =
-  'Contrast is an approximate proxy (real pixel-luminance math, sampled per panel) — not a strict WCAG text-contrast conformance test, since exact lettering regions aren\'t separately detected. Structural issues (reading order, missing descriptions, unattributed dialogue) are exact, checked directly against the analyzed panel data. No composite score is produced.';
+  'Contrast is an approximate estimate — real light/dark math run on the actual pixels of each panel, not a guess. It\'s not an exact check of the comic\'s lettering specifically, since this doesn\'t separately detect where the text sits within a panel. Structural issues (reading order, missing descriptions, dialogue with no speaker attached) are exact, checked directly against the real analyzed panel data. No single 0-100 accessibility score is shown, because no accepted method exists for boiling all of this down into one honest number.';
 
 async function computeAccessibilityReport(imageBase64, panels) {
   const panelContrast = await contrastByPanel(imageBase64, panels);

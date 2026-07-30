@@ -30,7 +30,7 @@ describe('computeAccessibilityReport (full orchestration, real jimp decode)', ()
     expect(allWhite.contrastRatio).toBe(1);
     expect(allWhite.lowContrast).toBe(true);
     expect(report.structuralIssues).toEqual([]);
-    expect(report.methodologyNote).toContain('not a strict WCAG text-contrast conformance test');
+    expect(report.methodologyNote).toContain('not an exact check of the comic\'s lettering specifically');
   });
 });
 

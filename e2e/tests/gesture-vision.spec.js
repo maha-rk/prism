@@ -23,7 +23,7 @@ test.describe('Gesture Vision', () => {
 
   test('home link is reachable before the camera starts (not blocked by the start overlay)', async ({ page }) => {
     await page.goto('/src/modes/gesture-vision/index.html', { waitUntil: 'networkidle' });
-    await page.click('#modeHeader .home-link');
+    await page.click('a.home-link');
     await expect(page).toHaveTitle('Prism');
   });
 

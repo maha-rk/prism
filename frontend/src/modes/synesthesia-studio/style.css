@@ -4,34 +4,88 @@ html, body {
   background: #f2ede6;
   color: #241f1a;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 17px;
+}
+
+/* Soft blurred color blobs behind the content -- real blur (not just a
+   gradient falloff) reads as an actual design choice rather than a flat
+   tint. No image asset, so it stays crisp and costs nothing to load. */
+.bg-decor {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+}
+.blob-1 {
+  width: 560px;
+  height: 560px;
+  top: -200px;
+  right: -160px;
+  background: rgba(107, 143, 111, 0.42);
+}
+.blob-2 {
+  width: 460px;
+  height: 460px;
+  bottom: -220px;
+  left: -160px;
+  background: rgba(107, 143, 111, 0.28);
+}
+.blob-3 {
+  width: 380px;
+  height: 380px;
+  top: 38%;
+  left: 58%;
+  background: rgba(66, 79, 61, 0.16);
 }
 
 #app {
-  max-width: 820px;
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 32px 20px 80px;
+  padding: 90px 24px 80px;
 }
 
+/* Pinned to the actual page edge, like Gesture Vision's back badge --
+   not indented in with the centered content column, which reads as
+   part of the page body rather than a nav element. */
 .home-link {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
   display: inline-block;
-  color: #5c554a;
+  color: #6b8f6f;
   text-decoration: none;
-  font-size: 13px;
-  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(107, 143, 111, 0.35);
+  border-radius: 6px;
+  padding: 10px 18px;
 }
-.home-link:hover, .home-link:focus-visible { color: #6b8f6f; outline: none; }
+.home-link:hover, .home-link:focus-visible { color: #4f6d52; outline: none; }
 
 h1 {
   font-family: 'Playfair Display', Georgia, serif;
   font-weight: 500;
+  font-size: 2.75rem;
   color: #241f1a;
   margin-bottom: 4px;
 }
-.intro, .hint { color: #5c554a; line-height: 1.5; }
+.intro, .hint { color: #5c554a; font-size: 1.15rem; line-height: 1.6; }
 .honesty-note {
   color: #6b6358;
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 0.95rem;
+  line-height: 1.55;
   border-left: 3px solid #d8d0c4;
   padding-left: 10px;
 }
@@ -48,10 +102,10 @@ h1 {
   border: none;
   border-bottom: 2px solid transparent;
   color: #5c554a;
-  padding: 10px 4px;
+  padding: 11px 5px;
   margin: 0 8px 0 0;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 1.05rem;
   cursor: pointer;
   border-radius: 0;
 }
@@ -79,9 +133,9 @@ section {
   background: #eef2ec;
   border: 1px solid #6b8f6f;
   border-radius: 6px;
-  padding: 12px 14px;
+  padding: 14px 16px;
   color: #241f1a;
-  font-size: 14px;
+  font-size: 1rem;
   line-height: 1.5;
   margin-top: 12px;
 }
@@ -91,7 +145,8 @@ section {
   background: #f8f5f0;
   border: 1px solid #d8d0c4;
   border-radius: 6px;
-  padding: 10px 16px;
+  padding: 12px 18px;
+  font-size: 1.05rem;
   color: #6b8f6f;
   cursor: pointer;
 }
@@ -101,7 +156,7 @@ section {
 .style-picker label {
   display: block;
   color: #5c554a;
-  font-size: 13px;
+  font-size: 0.9rem;
   margin-bottom: 4px;
 }
 #styleSelect {
@@ -110,8 +165,8 @@ section {
   border-radius: 6px;
   color: #241f1a;
   font-family: inherit;
-  font-size: 14px;
-  padding: 8px 10px;
+  font-size: 1rem;
+  padding: 9px 11px;
 }
 
 #moodTextInput {
@@ -124,8 +179,8 @@ section {
   border-radius: 6px;
   color: #241f1a;
   font-family: inherit;
-  font-size: 14px;
-  padding: 10px 12px;
+  font-size: 1rem;
+  padding: 11px 13px;
   margin-top: 8px;
   resize: vertical;
 }
@@ -135,10 +190,10 @@ button {
   background: #f8f5f0;
   color: #6b8f6f;
   border: 1px solid #d8d0c4;
-  border-radius: 21px;
-  padding: 10px 20px;
+  border-radius: 6px;
+  padding: 11px 22px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 1rem;
   cursor: pointer;
   margin-top: 16px;
   margin-right: 8px;
@@ -161,11 +216,11 @@ button:not(:disabled):hover { background: #f2ede6; }
 }
 .gallery-item img { display: block; width: 100%; height: auto; }
 .gallery-item p {
-  padding: 8px 10px;
+  padding: 9px 11px;
   margin: 0;
   color: #5c554a;
-  font-size: 12px;
-  line-height: 1.4;
+  font-size: 0.85rem;
+  line-height: 1.45;
 }
 
 .player-controls {
@@ -177,7 +232,7 @@ button:not(:disabled):hover { background: #f2ede6; }
 }
 .mood-description {
   color: #4a4339;
-  font-size: 14px;
+  font-size: 1rem;
   line-height: 1.5;
   margin: 0 0 4px;
 }

@@ -4,26 +4,80 @@ html, body {
   background: #f2ede6;
   color: #241f1a;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 17px;
+}
+
+/* Soft blurred color blobs behind the content -- real blur (not just a
+   gradient falloff) reads as an actual design choice rather than a flat
+   tint. No image asset, so it stays crisp and costs nothing to load. */
+.bg-decor {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+}
+.blob-1 {
+  width: 560px;
+  height: 560px;
+  top: -200px;
+  right: -160px;
+  background: rgba(201, 121, 63, 0.42);
+}
+.blob-2 {
+  width: 460px;
+  height: 460px;
+  bottom: -220px;
+  left: -160px;
+  background: rgba(201, 121, 63, 0.28);
+}
+.blob-3 {
+  width: 380px;
+  height: 380px;
+  top: 38%;
+  left: 58%;
+  background: rgba(91, 79, 61, 0.16);
 }
 
 #app {
-  max-width: 760px;
+  position: relative;
+  z-index: 1;
+  max-width: 860px;
   margin: 0 auto;
-  padding: 32px 20px 80px;
+  padding: 90px 24px 80px;
 }
 
+/* Pinned to the actual page edge, like Gesture Vision's back badge --
+   not indented in with the centered content column, which reads as
+   part of the page body rather than a nav element. */
 .home-link {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
   display: inline-block;
-  color: #5c554a;
+  color: #c9793f;
   text-decoration: none;
-  font-size: 13px;
-  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(201, 121, 63, 0.35);
+  border-radius: 6px;
+  padding: 10px 18px;
 }
-.home-link:hover, .home-link:focus-visible { color: #c9793f; outline: none; }
+.home-link:hover, .home-link:focus-visible { color: #a35f2e; outline: none; }
 
 h1 {
   font-family: 'Playfair Display', Georgia, serif;
   font-weight: 500;
+  font-size: 2.75rem;
   color: #241f1a;
   margin-bottom: 4px;
 }
@@ -34,7 +88,8 @@ h2, h3 {
 
 .intro, .hint {
   color: #5c554a;
-  line-height: 1.5;
+  font-size: 1.15rem;
+  line-height: 1.6;
 }
 
 section {
@@ -48,9 +103,9 @@ section {
   background: #f8ece0;
   border: 1px solid #c9793f;
   border-radius: 6px;
-  padding: 12px 14px;
+  padding: 14px 16px;
   color: #241f1a;
-  font-size: 14px;
+  font-size: 1rem;
   line-height: 1.5;
 }
 
@@ -59,9 +114,11 @@ section {
   background: #f8f5f0;
   border: 1px solid #d8d0c4;
   border-radius: 6px;
-  padding: 10px 16px;
+  padding: 12px 18px;
+  font-size: 1.05rem;
   color: #c9793f;
   cursor: pointer;
+  margin-right: 20px;
 }
 .upload-label input { display: block; margin-top: 8px; }
 
@@ -69,10 +126,10 @@ button {
   background: #f8f5f0;
   color: #c9793f;
   border: 1px solid #d8d0c4;
-  border-radius: 21px;
-  padding: 10px 20px;
+  border-radius: 6px;
+  padding: 11px 22px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 1rem;
   cursor: pointer;
   margin-top: 16px;
   margin-right: 8px;
@@ -119,14 +176,14 @@ button:not(:disabled):hover { background: #f2ede6; }
 #panelList .panel-desc {
   flex: 1;
   color: #4a4339;
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 #panelList .reorder-btns { display: flex; gap: 4px; }
 #panelList .reorder-btns button {
   margin: 0;
-  padding: 4px 10px;
-  font-size: 12px;
+  padding: 5px 12px;
+  font-size: 0.85rem;
 }
 
 #accessibilityReport {
@@ -136,7 +193,7 @@ button:not(:disabled):hover { background: #f2ede6; }
 }
 #accessibilityReport h3 {
   color: #c9793f;
-  font-size: 15px;
+  font-size: 1.1rem;
   margin: 0 0 4px;
 }
 #accessibilityFindings {
@@ -148,11 +205,11 @@ button:not(:disabled):hover { background: #f2ede6; }
   background: #f8f5f0;
   border: 1px solid #e2dcd2;
   border-radius: 6px;
-  padding: 8px 12px;
+  padding: 9px 13px;
   margin-bottom: 6px;
   color: #4a4339;
-  font-size: 13px;
-  line-height: 1.4;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 #boostContrastBtn { margin-top: 4px; }
@@ -171,11 +228,11 @@ button:not(:disabled):hover { background: #f2ede6; }
   padding: 0;
 }
 #transcript li {
-  padding: 8px 10px;
+  padding: 9px 11px;
   border-left: 3px solid transparent;
   color: #5c554a;
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 1rem;
+  line-height: 1.55;
 }
 #transcript li.active {
   border-left-color: #c9793f;
@@ -191,7 +248,7 @@ button:not(:disabled):hover { background: #f2ede6; }
   display: block;
   color: #8a8173;
   font-style: italic;
-  font-size: 12px;
+  font-size: 0.85rem;
   margin-bottom: 2px;
 }
 

@@ -6,6 +6,17 @@ An AI-powered storytelling reconstruction engine for the **AI Builders Challenge
 July 2026, *Reimagine Creative Industries with AI*. Every story deserves every
 audience.
 
+![Prism landing page — four modes, one shared accessibility preference](docs/screenshots/landing.png)
+
+I built this alone, over the course of this challenge, because I kept coming
+back to one specific frustration: accessibility tooling for creative work
+almost always means *less* — a flattened caption instead of a scene, a text
+transcript instead of a performance. I wanted to build the opposite of that:
+something that adds a dimension instead of subtracting one. Four small,
+honest, independently-working modes, each one a different way of moving a
+story across the senses, and a shared preference that adapts all of them to
+how you're actually experiencing them.
+
 ## Problem
 
 Existing accessibility tools for visual storytelling — alt text, flat image
@@ -39,6 +50,56 @@ preference (not a separate mode or page) that adapts every mode's
 behavior to how you're actually experiencing it — blind, low-vision,
 dyslexic, deaf/hard-of-hearing, or motor-impaired. See below.
 
+## Design decisions
+
+A few honest notes on why Prism ended up looking like this, rather than
+something else.
+
+**Why not another AI story generator.** My first instinct, like a lot of
+people's, was some version of "type a prompt, get a story back." The more I
+looked around, the more that exact shape kept showing up — story
+generators, screenplay generators, campaign generators, one AI wrapper
+after another producing new content on demand. That's a legitimately useful
+thing to build, but it wasn't the thing I actually cared about. The
+question I kept returning to wasn't "how do we make more stories," it was
+"who's currently locked out of the stories that already exist." That's a
+different problem, and it's the one Prism is actually trying to solve.
+
+**Why there's no accessibility score.** Early on I sketched a feature that
+would output something like "Accessibility Score: 78/100" for any uploaded
+page — it demos beautifully. It also isn't real. No model can honestly
+produce that number without a validated methodology behind it: real outcome
+data from real blind, low-vision, and neurodiverse readers, collected over
+time. I don't have that, and pretending otherwise felt like exactly the
+wrong instinct to build into an *accessibility* tool of all things. So
+Prism only ever surfaces two kinds of findings: things that are genuinely,
+deterministically computable (real WCAG contrast math on real pixels,
+structural facts checked directly against the analyzed page), and it says
+so plainly when it's just an approximation rather than a certified test.
+Nowhere in this project does a number get invented to sound more confident
+than the underlying evidence actually supports.
+
+**Why the IBM parts are described honestly, warts and all.** This is built
+on a Lite-tier watsonx account, and Lite tier has real limits — Granite
+Vision isn't available on it in any region I could find, and the one
+vision-capable model that was available turned out to already be in a
+withdrawn lifecycle state. I could have quietly avoided mentioning that.
+Instead the architecture notes below say exactly which model is doing which
+job, and exactly where a non-IBM provider (Hugging Face, for image
+generation — watsonx has no image-generation model at all, on any plan)
+had to step in because IBM's own stack genuinely doesn't offer that
+capability yet. The challenge's own rules explicitly welcome outside tools,
+so there wasn't a good reason to hide this — only a bad one.
+
+**Why four small modes instead of one big pipeline.** It would have been
+easy to chain everything into a single "upload once, get everything"
+mega-flow. I chose the opposite: four independent, standalone experiences
+that each have to work completely on their own, because a person using
+Prism might only ever need one of them — a blind musician doesn't need a
+comic-narration feature, a low-vision reader doesn't need hand-gesture
+music. Depth in a few honestly-scoped things over breadth in one
+overextended thing.
+
 ## Gesture Vision — how it works
 
 Left hand: number of fingers extended selects a scale degree (I-V); the
@@ -55,6 +116,8 @@ thing a blind player can't infer from the sound alone. Volume and filter
 brightness are *not* announced: they're continuous, and the sound itself
 already carries that information, the same way a sighted player reads them
 by ear rather than by watching a meter.
+
+![Gesture Vision — real-time two-hand skeleton overlay, left hand (chord/key) in blue, right hand (quality/volume/filter) in orange](docs/screenshots/gesture-vision.png)
 
 ### Attribution
 
@@ -102,6 +165,13 @@ from the analyzed panel data (ambiguous/incomplete reading order, panels
 with no description, dialogue with no attributed speaker). Deliberately
 no composite "accessibility score" — see below for why.
 
+This screenshot is a real run against an actual public-domain Golden Age
+comic page (*Startling Comics* #10, 1946 — via Wikimedia Commons), not a
+mock: five real detected panels, a real reading order, and real tagged
+sound cues (`[gunshot, punch]`) shown as bracketed captions.
+
+![See Through Sound — real panel detection, reading-order review, and accessibility report on a real comic page](docs/screenshots/see-through-sound.png)
+
 ## Emotion Lens — how it works
 
 Upload a page (reusing the same panel-analysis pipeline as See Through
@@ -118,6 +188,12 @@ fabricated confidence number — grounded in the same real audio-description
 and literary-analysis principles used throughout Prism, not an ad hoc
 prompt. Answers are read aloud, not just displayed, since this is meant to
 be used by ear.
+
+A real question against the same real analyzed page — the answer cites
+what's actually shown (the gun, the demand to "get back") rather than
+inventing a motive the page never states:
+
+![Emotion Lens — a real grounded answer, citing specific page evidence rather than asserting an unstated motive](docs/screenshots/emotion-lens.png)
 
 ## Synesthesia Studio — how it works
 
@@ -305,9 +381,13 @@ platform — not accessibility-only, and not another content generator.
 
 ## Honesty note
 
-This is a first prototype, not a validated solution co-designed with blind
-or neurodiverse users. Feedback from that community is the highest-value
-thing that could improve this project.
+I want to be upfront about what this is and isn't. This is a first
+prototype I built alone in a short window, not a validated solution
+co-designed with blind or neurodiverse users — every design choice here is
+my best-informed guess, grounded in real accessibility guidelines, but a
+guess all the same. Feedback from the communities Prism is actually meant
+to serve would be the single highest-value thing that could improve it from
+here, more than any additional feature I could build on my own.
 
 ## Running locally
 
