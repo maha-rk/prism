@@ -1,3 +1,7 @@
+import { applyAccessProfile } from '../../shared/accessProfile.js';
+
+applyAccessProfile();
+
 const BACKEND_URL = window.PRISM_BACKEND_URL || 'http://localhost:3002';
 
 const pageInput = document.getElementById('pageInput');
@@ -112,7 +116,7 @@ async function playAnswer(text) {
   }
 }
 
-function addToConversation(question, answer) {
+function addToConversation(question, answer, citationWarning) {
   const li = document.createElement('li');
   const q = document.createElement('p');
   q.className = 'question';
@@ -121,6 +125,12 @@ function addToConversation(question, answer) {
   a.className = 'answer';
   a.textContent = answer;
   li.append(q, a);
+  if (citationWarning) {
+    const note = document.createElement('p');
+    note.className = 'citation-note';
+    note.textContent = "Note: a quoted detail in this answer couldn't be verified against the actual page — treat it with extra caution.";
+    li.append(note);
+  }
   conversation.appendChild(li);
   li.scrollIntoView({ block: 'nearest' });
 }
@@ -143,7 +153,7 @@ askForm.addEventListener('submit', async (e) => {
     if (!res.ok) throw new Error(`ask failed: ${res.status}`);
     const data = await res.json();
 
-    addToConversation(question, data.answer);
+    addToConversation(question, data.answer, data.citationWarning);
     questionInput.value = '';
     announce('Answer ready.');
     playAnswer(data.answer);

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Prism — See Through Sound</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../../shared/accessProfile.css" />
 </head>
 <body>
   <main id="app">
@@ -36,6 +37,17 @@
       <ol id="panelList"></ol>
       <button id="confirmOrderBtn" type="button">Confirm order and narrate</button>
       <button id="reanalyzeBtn" type="button">Re-analyze this page</button>
+
+      <div id="accessibilityReport" class="hidden">
+        <h3>Accessibility notes</h3>
+        <p id="accessibilityMethodologyNote" class="hint"></p>
+        <ul id="accessibilityFindings"></ul>
+        <button id="boostContrastBtn" type="button" class="hidden">Generate high-contrast version</button>
+        <div id="highContrastResult" class="hidden">
+          <img id="highContrastImage" alt="High-contrast version of the uploaded page" />
+          <p class="hint">Real per-channel histogram-stretch contrast, computed in your browser — not an AI guess.</p>
+        </div>
+      </div>
     </section>
 
     <section id="narrateSection" class="hidden">

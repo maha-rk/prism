@@ -126,6 +126,13 @@ button:focus-visible { outline: 2px solid #e8a13d; }
   line-height: 1.5;
   margin: 0;
 }
+#conversation .citation-note {
+  color: #e8a13d;
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 8px 0 0;
+  font-style: italic;
+}
 
 .sr-only {
   position: absolute;

@@ -68,4 +68,62 @@ test.describe('See Through Sound', () => {
     await expect(page.locator('#reviewSection')).toBeVisible({ timeout: 15000 });
     await expect(page.locator('#accessibilityReport')).toBeHidden();
   });
+
+  test('shows the "Generate high-contrast version" button only when a panel is flagged low-contrast, and it produces a real image', async ({ page }) => {
+    await page.route('**/api/comic/analyze', async (route) => {
+      const response = await route.fetch();
+      const body = await response.json();
+      body.accessibility = {
+        panelContrast: [{ id: body.panels[0].id, contrastRatio: 1.1, lowContrast: true }],
+        structuralIssues: [],
+        methodologyNote: 'test',
+      };
+      await route.fulfill({ response, json: body });
+    });
+
+    await page.goto('/src/modes/see-through-sound/index.html', { waitUntil: 'networkidle' });
+    await page.setInputFiles('#pageInput', FIXTURE);
+    await page.click('#analyzeBtn');
+    await expect(page.locator('#accessibilityReport')).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('#boostContrastBtn')).toBeVisible();
+
+    await page.click('#boostContrastBtn');
+    await expect(page.locator('#highContrastResult')).toBeVisible();
+    const src = await page.locator('#highContrastImage').getAttribute('src');
+    expect(src).toMatch(/^data:image\/png;base64,/);
+  });
+
+  test('hides the "Generate high-contrast version" button when nothing is flagged low-contrast', async ({ page }) => {
+    await page.route('**/api/comic/analyze', async (route) => {
+      const response = await route.fetch();
+      const body = await response.json();
+      body.accessibility = {
+        panelContrast: [{ id: body.panels[0].id, contrastRatio: 15, lowContrast: false }],
+        structuralIssues: [],
+        methodologyNote: 'test',
+      };
+      await route.fulfill({ response, json: body });
+    });
+
+    await page.goto('/src/modes/see-through-sound/index.html', { waitUntil: 'networkidle' });
+    await page.setInputFiles('#pageInput', FIXTURE);
+    await page.click('#analyzeBtn');
+    await expect(page.locator('#accessibilityReport')).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('#boostContrastBtn')).toBeHidden();
+  });
+
+  test('sound effects are shown as visible bracketed captions, not just played as audio', async ({ page }) => {
+    await page.goto('/src/modes/see-through-sound/index.html', { waitUntil: 'networkidle' });
+    await page.setInputFiles('#pageInput', FIXTURE);
+    await page.click('#analyzeBtn');
+    await expect(page.locator('#reviewSection')).toBeVisible({ timeout: 15000 });
+
+    // The default mock story tags real sfx on every panel (rain/wind,
+    // heartbeat, crash, whoosh) — visible in the pre-narration panel list.
+    await expect(page.locator('#panelList')).toContainText('[');
+
+    await page.click('#confirmOrderBtn');
+    await expect(page.locator('#playerControls')).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('#transcript .sfx-caption').first()).toBeVisible();
+  });
 });

@@ -34,6 +34,11 @@ modes a user picks from:
   another: a comic panel into a new illustration, an image into a
   generative ambient soundscape, or a written mood into one.
 
+Cutting across all four: **Creative Access Mode**, a single shared
+preference (not a separate mode or page) that adapts every mode's
+behavior to how you're actually experiencing it — blind, low-vision,
+dyslexic, deaf/hard-of-hearing, or motor-impaired. See below.
+
 ## Gesture Vision — how it works
 
 Left hand: number of fingers extended selects a scale degree (I-V); the
@@ -90,6 +95,13 @@ pulled from a real sound-effect library, so there's no licensing risk.
 Playback pans left/right per panel based on its horizontal position on the
 page — simple rule-based stereo positioning, not true 3D spatial audio.
 
+**Accessibility report** (shown alongside the reading-order review, real
+analysis only — see Architecture notes below for why): real pixel-level
+contrast math per panel, plus checkable structural facts drawn directly
+from the analyzed panel data (ambiguous/incomplete reading order, panels
+with no description, dialogue with no attributed speaker). Deliberately
+no composite "accessibility score" — see below for why.
+
 ## Emotion Lens — how it works
 
 Upload a page (reusing the same panel-analysis pipeline as See Through
@@ -145,6 +157,145 @@ one page:
   dawn" and "a stormy night at sea" produce audibly, meaningfully different
   soundscapes, not just different labels.
 
+## Creative Access Mode — how it works
+
+Select "Experiencing this as: blind / low-vision / dyslexic / deaf /
+motor-impaired" once, on the landing page — it's stored on-device
+(`localStorage`, nothing sent to a server) and read by every mode, so one
+choice changes behavior everywhere instead of five separate settings
+screens. Deliberately modest, real adaptations rather than a vague
+"personalizes everything" claim:
+
+- **Low vision**: larger base text, boosted contrast on secondary/muted
+  text that's intentionally dim by design in the dark theme (exactly the
+  text a low-vision user is least able to read), thicker control borders.
+- **Dyslexic**: more line-height and letter-spacing, a plain sans-serif in
+  place of the monospace font used elsewhere, left-aligned text with a
+  bounded line length. Deliberately *not* claiming a specific "dyslexia
+  font" fixes reading — the evidence for that is weak/contested — just the
+  broadly-agreed, uncontroversial basics.
+- **Deaf / hard of hearing**: transcript and conversation text rendered
+  larger and more prominent (every mode already shows a full text
+  equivalent alongside its spoken audio; this just emphasizes it).
+- **Motor impaired**: larger click targets and button spacing across every
+  control.
+- **Blind**: focus automatically moves to the first actionable control on
+  page load, skipping the need to Tab past intro text — with one explicit
+  override: on Gesture Vision specifically (the mode built for blind
+  musicians), focus goes to the Start control rather than the key/tone
+  selectors that happen to appear first in the page's markup.
+
+This is a real, if intentionally narrow, answer to "personalized creative
+assistant" — one of the challenge's own named solution areas that none of
+the other 4 modes address on its own.
+
+## Accessibility report — how it works
+
+Shown automatically alongside See Through Sound's reading-order review,
+whenever real (non-mock) panel analysis succeeds. Two kinds of findings,
+both genuinely computed — no AI model, no invented score:
+
+- **Approximate visual contrast per panel** — real pixel math (the WCAG
+  relative-luminance formula, applied to actual sampled pixels within each
+  panel's detected bounding box). Deliberately *not* called "WCAG
+  text-contrast conformance": that standard applies to specific
+  text-on-background pairs with known locations, and this pipeline doesn't
+  separately detect where lettering sits on the page — this measures
+  overall light/dark separation within each panel as an honest, disclosed
+  proxy, not an oversold claim of formal conformance.
+- **Structural issues** drawn directly from the already-analyzed panel
+  data: ambiguous or incomplete reading order, a panel with no scene
+  description, a dialogue line with no attributed speaker. Real, checkable
+  facts, not estimates.
+
+**Why there's no "Accessibility Score: 72/100."** A single composite score
+would imply a validated measurement methodology behind it — real
+accessibility scoring requires actual outcome data from real user studies
+with real blind/low-vision/dyslexic participants, which this project does
+not have and can't collect in the time available. Presenting a fabricated
+number with false precision would be a real credibility risk, not a
+convenience — the same reason Emotion Lens is built to hedge honestly
+instead of asserting a guess as fact. Only run on real panel analysis, not
+the mock fallback: the mock story's bounding boxes are a fixed generic
+grid with no correspondence to the actual uploaded image's real layout, so
+computing contrast against them would be real math applied to meaningless
+regions.
+
+**Two things the report doesn't just detect — it fixes.** Sound effects
+(`gunshot`, `thunder`, etc.) used to be audio-only, synthesized by the
+Web Audio SFX engine with no visible equivalent anywhere — a deaf or
+hard-of-hearing reader following the transcript would silently miss any
+panel whose meaning depended on one. They're now shown as a bracketed
+caption (`[rain, thunder]`), the standard closed-captioning convention,
+in both the pre-narration panel review and the playback transcript — not
+just reported as a gap, actually closed. And when a panel is flagged
+low-contrast, a "Generate high-contrast version" button runs a real
+per-channel histogram-stretch (find the actual darkest/lightest pixel
+values across the whole image, linearly remap every pixel to use the
+full 0–255 range) entirely in the browser via Canvas — genuine,
+deterministic contrast enhancement, not an AI-generated "enhanced"
+image.
+
+## Architecture notes
+
+**Three-tier provider cascade.** Every AI call site (panel analysis,
+narrative reconstruction, character-sheet extraction, Emotion Lens Q&A,
+Synesthesia's mood extraction, and TTS) tries whichever provider is
+configured as primary, then falls through the other real providers in a
+fixed order, and only then falls back to a mock — never straight from one
+failure to a placeholder. The third rung, `local`, runs entirely on-device
+via [Ollama](https://ollama.com) (vision: llava; text: llama3.2:1b)
+and macOS's built-in `say` (TTS) — no API key, no billing, no rate limit,
+so it's the one option that can never run out mid-demo the way watsonx's
+300k-token/month cap and Gemini's 20-request/day free tier both did during
+development. Honest tradeoff: local models are meaningfully weaker and
+much slower than the cloud providers — llava takes roughly 60-90 seconds to
+analyze a comic page (vs. a few seconds for watsonx/Gemini); a smaller,
+faster model (moondream) was tried first and reliably failed to produce
+valid JSON against the full structured schema, so llava is the default
+despite the latency cost. Tested side by side specifically on the tasks
+where instruction-following matters most: llama3.2:1b readily fabricated
+unstated backstory on Emotion Lens's grounded Q&A and invented new visual
+details during narrative reconstruction (both explicitly disallowed by
+their prompts) where llama3.2:3b did meaningfully better, though not
+perfectly — smaller local models are just weaker at instruction-following
+than the cloud providers, a real, disclosed limitation, not papered over.
+
+**Citation guard.** Emotion Lens's Q&A is built around "cite evidence,
+hedge honestly, never invent unstated backstory" (`rag/narrativeGuidelines.md`)
+— but until now that was enforced entirely by *asking the model nicely* in
+the prompt. `emotionLens/citationGuard.js` turns that into a code-level
+check: any text an answer puts in quotation marks is verified against the
+actual story bible it was grounded on. A model that paraphrases without
+quoting is fine — that's expected, encouraged behavior. A model that quotes
+something that was never actually said gets one corrective retry; if the
+citation still can't be verified, the UI surfaces an explicit caveat rather
+than silently trusting the model's word for it.
+
+**Automated tests.** Two suites:
+- `backend/test/` — a Vitest suite (72 tests) covering the citation guard,
+  the cascade ordering logic, provider validation/normalization logic
+  (mood clamping, panel-shape validation, SFX vocabulary filtering), the
+  accessibility report's contrast math and structural checks (including a
+  real pixel-decode test against a synthetic black/white image), and two
+  integration tests exercising the real fallback/retry wiring through
+  actual provider modules (a forced watsonx→gemini→local cascade, and the
+  citation guard's retry-then-warn flow) with only the local provider's
+  network call stubbed — deterministic, no live API or running Ollama
+  needed. `npm test` from `backend/`.
+- `e2e/` — a Playwright suite (21 tests) covering all 4 modes end to end
+  (upload → analyze → interact, cross-tab state, home navigation), Creative
+  Access Mode (profile persistence across pages, the Gesture Vision focus
+  override), the accessibility report's frontend rendering, the visible
+  SFX captions, and the high-contrast button (via route interception,
+  since the mock-forced test backend never populates a real accessibility
+  report itself) — against dedicated test instances of the backend/frontend that
+  always force every provider to `mock`, regardless of what's in
+  `backend/.env`, so the suite is free, fast, and deterministic on any
+  machine, never dependent on real credentials, quota, or Ollama being
+  installed. `npm test` from `e2e/` (first run: `npm install && npx
+  playwright install chromium`).
+
 ## Selected challenge theme
 
 July Challenge — Reimagine Creative Industries with AI. Prism is positioned
@@ -170,6 +321,13 @@ Every other mode needs the backend running (all providers default to
 `mock` — see `backend/.env.example` — so everything works with zero
 credentials).
 
+Running the test suites:
+
+```bash
+cd backend && npm test        # Vitest unit suite — no server, no credentials needed
+cd e2e && npm install && npx playwright install chromium && npm test  # Playwright e2e suite
+```
+
 ## File structure
 
 ```
@@ -178,6 +336,9 @@ prism/
     index.html          Mode selector / landing page
     serve.js             Zero-dependency static server
     src/
+      shared/
+        accessProfile.js       Creative Access Mode: shared preference read by every page
+        accessProfile.css       Per-profile adaptations (contrast, spacing, font, click targets)
       modes/
         gesture-vision/
           index.html      Gesture Vision page
@@ -187,7 +348,7 @@ prism/
           chordSynth.js    Web Audio synth engine
           musicTheory.js   Chord/scale math
         see-through-sound/
-          index.html      Upload / reorder / playback page
+          index.html      Upload / reorder / playback page (+ accessibility report)
           style.css
           main.js          Wiring
           player.js         Sequences narration + SFX with stereo panning
@@ -204,29 +365,38 @@ prism/
   backend/
     server.js             Express app
     routes/
-      comicAnalyze.js      Phase A: panel detection + transcription
+      comicAnalyze.js      Phase A: panel detection + transcription + accessibility report
       narrate.js            Phase B: narrative reconstruction + script assembly
       tts.js                 Phase B: speech synthesis
       ask.js                  Emotion Lens: story-bible-grounded Q&A
       reimagine.js             Synesthesia Studio: per-panel image generation
       synesthesia.js            Synesthesia Studio: mood extraction (image or text)
-    vision/visionProvider.js   Mock / IBM watsonx / Gemini fallback (cascade + retry/fallback resilience)
+    vision/visionProvider.js   Mock / watsonx / Gemini / local (cascade + retry/fallback resilience)
     narration/                Reconstruction pass + deterministic script/voice/pan assembly
-    tts/ttsProvider.js         Mock / IBM Watson Text to Speech
+    tts/ttsProvider.js         Mock / IBM Watson Text to Speech / local (macOS `say`)
     emotionLens/
       storyBible.js            Structured per-panel/per-character index for Q&A grounding
-      qaProvider.js             Mock / IBM watsonx / Gemini fallback Q&A
+      qaProvider.js             Mock / watsonx / Gemini / local Q&A
+      citationGuard.js          Code-level check that a quoted answer is grounded in the story bible
     imageGen/
       characterSheet.js         Per-character visual description extraction
       imageProvider.js           Mock / Hugging Face (non-IBM — no watsonx image-gen model exists)
       stylePresets.js             Fixed art-style vocabulary shared with the frontend picker
     synesthesia/
       moodProvider.js            Continuous mood-profile extraction (image or text)
+    accessibility/
+      contrastChecker.js         Real pixel-luminance contrast math + structural checks — no AI
     shared/
-      cascade.js                 watsonx-first, Gemini-fallback helper used by every real provider
+      cascade.js                 N-step ordered fallback helper used by every real provider
       diskCache.js                Generic disk-persisted response cache (protects watsonx's token quota)
       geminiClient.js              Shared Gemini text/vision call helpers (non-IBM fallback)
+      localClient.js               Shared Ollama text/vision call helpers (zero-cost, zero-quota fallback)
     rag/                       Audio-description + narrative-analysis methodology corpora
     sfx/sfxVocabulary.js       Fixed SFX tag vocabulary shared with the frontend synth
+    test/                      Vitest unit suite (citation guard, cascade, provider validation, accessibility math)
+  e2e/                        Playwright end-to-end suite, all 4 modes, mock-forced test backend
+    playwright.config.js        Spins up isolated backend (3099) + frontend (5199) test instances
+    fixtures/                   Shared test fixture image
+    tests/                      One spec file per mode, plus access-profile.spec.js
   README.md
 ```

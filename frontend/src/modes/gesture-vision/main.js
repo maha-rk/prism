@@ -1,8 +1,18 @@
 import { GestureHandTracker } from './handGestures.js';
 import { ChordSynth } from './chordSynth.js';
 import { getChordName, getQualityLabel, getChordTones, getSolidNotes } from './musicTheory.js';
+import { applyAccessProfile, getAccessProfile } from '../../shared/accessProfile.js';
+
+applyAccessProfile();
 
 const startOverlay = document.getElementById('startOverlay');
+// The generic "focus the first actionable control" behavior would land on
+// the key/tone selects (they appear first in DOM order), not the actually
+// important first action here — starting the instrument. This is the one
+// mode Creative Access Mode's "blind" profile matters most for (it's built
+// for blind musicians), so it gets an explicit override rather than
+// deferring to the generic heuristic.
+if (getAccessProfile() === 'blind') startOverlay.focus();
 const webcam = document.getElementById('webcam');
 const overlayCanvas = document.getElementById('overlay');
 const overlayCtx = overlayCanvas.getContext('2d');

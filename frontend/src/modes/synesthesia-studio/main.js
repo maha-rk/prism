@@ -1,4 +1,7 @@
 import { SoundscapeSynth } from './soundscapeSynth.js';
+import { applyAccessProfile } from '../../shared/accessProfile.js';
+
+applyAccessProfile();
 
 const BACKEND_URL = window.PRISM_BACKEND_URL || 'http://localhost:3002';
 

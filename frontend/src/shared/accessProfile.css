@@ -1,0 +1,55 @@
+/* Creative Access Mode — real, modest, disclosed adaptations per profile.
+   Deliberately not oversold: e.g. no claim that a specific "dyslexia font"
+   fixes reading for dyslexic users (evidence for that is weak/contested) —
+   just the broadly-agreed, uncontroversial basics: more line/letter
+   spacing, a plain sans-serif instead of dense monospace, left-aligned
+   text. */
+
+body.access-low-vision {
+  font-size: 120%;
+}
+body.access-low-vision .hint,
+body.access-low-vision .intro {
+  color: #e8e2d4; /* muted secondary text is intentionally low-contrast by
+    default for a dark theme (design polish) — boosted here since that's
+    exactly the kind of low-contrast text a low-vision user is least able
+    to read */
+}
+body.access-low-vision button,
+body.access-low-vision .upload-label {
+  border-width: 2px;
+}
+
+body.access-dyslexic {
+  font-family: Verdana, Arial, sans-serif !important;
+  line-height: 1.8 !important;
+  letter-spacing: 0.02em !important;
+}
+body.access-dyslexic p,
+body.access-dyslexic li {
+  text-align: left !important;
+  max-width: 60ch;
+}
+
+body.access-deaf .transcript,
+body.access-deaf #transcript,
+body.access-deaf #conversation {
+  font-size: 108%;
+}
+body.access-deaf .mock-warning,
+body.access-deaf .citation-note {
+  border-width: 2px;
+}
+
+body.access-motor button,
+body.access-motor .upload-label,
+body.access-motor select,
+body.access-motor input[type='text'] {
+  padding-top: 14px;
+  padding-bottom: 14px;
+  min-height: 44px; /* a widely-cited minimum comfortable touch/click target size */
+}
+body.access-motor button {
+  margin-right: 12px;
+  margin-bottom: 8px;
+}

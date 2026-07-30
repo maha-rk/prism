@@ -33,12 +33,43 @@
     a.mode-card:hover, a.mode-card:focus-visible { border-color: #f0904a; outline: none; }
     a.mode-card h2 { margin: 0 0 0.35rem; font-size: 1.1rem; }
     a.mode-card p { margin: 0; color: #b7b7c0; font-size: 0.9rem; }
+    .access-mode {
+      margin-top: 1.75rem;
+      width: min(100%, 32rem);
+      text-align: left;
+    }
+    .access-mode label { font-size: 0.85rem; color: #b7b7c0; display: block; margin-bottom: 0.35rem; }
+    .access-mode select {
+      background: #1a1a20;
+      color: #f2f2f5;
+      border: 1px solid #3a3a42;
+      border-radius: 6px;
+      padding: 0.5rem 0.6rem;
+      font-size: 0.9rem;
+      font-family: inherit;
+    }
+    .access-mode select:focus-visible { outline: 2px solid #f0904a; }
+    .access-mode .hint { color: #8a8a93; font-size: 0.8rem; margin-top: 0.4rem; }
   </style>
+  <link rel="stylesheet" href="src/shared/accessProfile.css" />
 </head>
 <body>
   <h1>Prism</h1>
   <p class="tagline">One story. Infinite ways to experience it.</p>
   <p class="mission">Every story deserves every audience.</p>
+
+  <div class="access-mode">
+    <label for="accessProfileSelect">Experiencing this as:</label>
+    <select id="accessProfileSelect">
+      <option value="none">No preference</option>
+      <option value="blind">Blind</option>
+      <option value="low-vision">Low vision</option>
+      <option value="dyslexic">Dyslexic</option>
+      <option value="deaf">Deaf / hard of hearing</option>
+      <option value="motor">Motor impaired</option>
+    </select>
+    <p class="hint">Adapts text size, contrast, spacing, and focus behavior across every mode. Saved on this device only.</p>
+  </div>
 
   <nav aria-label="Prism feature modes">
     <a class="mode-card" href="src/modes/gesture-vision/index.html">
@@ -58,5 +89,15 @@
       <p>Translate one sense into another — image to illustration, image to soundscape, mood to soundscape.</p>
     </a>
   </nav>
+
+  <script type="module">
+    import { getAccessProfile, setAccessProfile, applyAccessProfile } from './src/shared/accessProfile.js';
+
+    const select = document.getElementById('accessProfileSelect');
+    select.value = getAccessProfile();
+    applyAccessProfile();
+
+    select.addEventListener('change', () => setAccessProfile(select.value));
+  </script>
 </body>
 </html>
