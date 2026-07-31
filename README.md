@@ -126,6 +126,8 @@ by ear rather than by watching a meter.
 
 The design goal is not to describe the instrument, but to make it playable without requiring sight. Discrete state changes such as chord, scale degree, and quality are surfaced through spoken confirmation because they are otherwise invisible to a blind performer. Continuous controls such as volume and timbre are left unannounced, since the sound itself already communicates those changes. The result is a musical interface that can be navigated by listening and performing, rather than by monitoring a visual display.
 
+Every non-gesture control lives on a single key so a player never has to take a hand off the instrument to go find a different one. The space bar counts presses within a short window: press it once to lock or unlock the spoken callouts, twice to change your key or tone by voice (say a key name or a tone like "warm synth" out loud, no menus involved), or three times to hear a full spoken walkthrough of every control, then the same number of presses again to close whatever that press opened. `M` mutes, `R` starts or stops recording your performance (both the instrument and your microphone), and `Escape` closes the help guide from anywhere.
+
 ## See Through Sound — how it works
 
 Upload a single comic/manga page image. A vision-LLM call (IBM watsonx
