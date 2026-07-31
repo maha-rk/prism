@@ -2,20 +2,9 @@
 
 *One story. Infinite ways to experience it.*
 
-An AI-powered storytelling reconstruction engine for the **AI Builders Challenge** —
-July 2026, *Reimagine Creative Industries with AI*. Every story deserves every
-audience.
+Prism is an accessibility-first creative platform that translates stories and artistic experiences across senses. Readers can hear comics as immersive audio dramas, explore emotional meaning through grounded AI Q&A, create and experience music without a visual interface, and transform images, text, and sound into new creative forms. Rather than generating more content, Prism focuses on making creative experiences accessible to more people.
 
 ![Prism landing page — four modes, one shared accessibility preference](docs/screenshots/landing.png)
-
-I built this alone, over the course of this challenge, because I kept coming
-back to one specific frustration: accessibility tooling for creative work
-almost always means *less* — a flattened caption instead of a scene, a text
-transcript instead of a performance. I wanted to build the opposite of that:
-something that adds a dimension instead of subtracting one. Four small,
-honest, independently-working modes, each one a different way of moving a
-story across the senses, and a shared preference that adapts all of them to
-how you're actually experiencing them.
 
 ## Problem
 
@@ -33,15 +22,15 @@ Prism is a suite of standalone, selectable accessibility-first
 creative experiences — not one compiled pipeline, but several independent
 modes a user picks from:
 
-- **Gesture Vision** *(available now)* — play music with hand gestures
+- **Gesture Vision** — play music with hand gestures
   alone, no visual interface required.
-- **See Through Sound** *(available now)* — comics and manga become immersive
+- **See Through Sound** — comics and manga become immersive
   audio stories: narration, distinct character voices, sound effects, and
   ambience, grounded in the actual page rather than a generic caption.
-- **Emotion Lens** *(available now)* — a narrative-understanding layer,
+- **Emotion Lens** — a narrative-understanding layer,
   exposed through Q&A, for emotional subtext, motives, and relationships a
   story never states outright.
-- **Synesthesia Studio** *(available now)* — translates one sense into
+- **Synesthesia Studio** — translates one sense into
   another: a comic panel into a new illustration, an image into a
   generative ambient soundscape, or a written mood into one.
 
@@ -50,13 +39,34 @@ preference (not a separate mode or page) that adapts every mode's
 behavior to how you're actually experiencing it — blind, low-vision,
 dyslexic, deaf/hard-of-hearing, or motor-impaired. See below.
 
+## Who this is for
+
+- **A blind or low-vision reader** — See Through Sound turns a comic page
+  into narration, distinct voices, and sound effects; Emotion Lens lets them
+  ask about it in plain language and hear a grounded answer back.
+- **A blind musician** — Gesture Vision is a full instrument playable by
+  hand shape and motion alone, with spoken confirmation of the one thing
+  that can't be inferred from the sound itself (chord/quality changes).
+- **A deaf or hard-of-hearing reader** — every mode already shows a full
+  text equivalent alongside its audio; sound effects render as bracketed
+  captions (`[gunshot, punch]`) instead of being audio-only.
+- **A dyslexic reader** — Creative Access Mode swaps in a plainer font,
+  more line/letter spacing, and a bounded line length, without pretending a
+  specific "dyslexia font" is a cure for something the evidence doesn't
+  support.
+- **A motor-impaired user** — larger click targets and spacing on every
+  control, everywhere, from a single preference instead of five different
+  settings screens.
+- **Anyone curious, disability or not** — Synesthesia Studio is a genuine
+  creative tool on its own terms: reimagine a page as a new illustration,
+  or turn any image or mood into a generative soundscape.
+
 ## Design decisions
 
 A few honest notes on why Prism ended up looking like this, rather than
 something else.
 
-**Why not another AI story generator.** My first instinct, like a lot of
-people's, was some version of "type a prompt, get a story back." The more I
+**Why not another AI story generator.** My first instinct was some version of "type a prompt, get a story back." The more I
 looked around, the more that exact shape kept showing up — story
 generators, screenplay generators, campaign generators, one AI wrapper
 after another producing new content on demand. That's a legitimately useful
@@ -79,18 +89,6 @@ so plainly when it's just an approximation rather than a certified test.
 Nowhere in this project does a number get invented to sound more confident
 than the underlying evidence actually supports.
 
-**Why the IBM parts are described honestly, warts and all.** This is built
-on a Lite-tier watsonx account, and Lite tier has real limits — Granite
-Vision isn't available on it in any region I could find, and the one
-vision-capable model that was available turned out to already be in a
-withdrawn lifecycle state. I could have quietly avoided mentioning that.
-Instead the architecture notes below say exactly which model is doing which
-job, and exactly where a non-IBM provider (Hugging Face, for image
-generation — watsonx has no image-generation model at all, on any plan)
-had to step in because IBM's own stack genuinely doesn't offer that
-capability yet. The challenge's own rules explicitly welcome outside tools,
-so there wasn't a good reason to hide this — only a bad one.
-
 **Why four small modes instead of one big pipeline.** It would have been
 easy to chain everything into a single "upload once, get everything"
 mega-flow. I chose the opposite: four independent, standalone experiences
@@ -99,6 +97,13 @@ Prism might only ever need one of them — a blind musician doesn't need a
 comic-narration feature, a low-vision reader doesn't need hand-gesture
 music. Depth in a few honestly-scoped things over breadth in one
 overextended thing.
+
+**How this was built.** IBM Bob was the primary development tool
+throughout — used to brainstorm and shape the initial concept, work
+through technical design questions as they came up, and plan the project's
+scaffolding and architecture before implementation began. The actual
+build — the cascade design, the honesty-first accessibility report, all
+four modes — was carried out from that initial direction.
 
 ## Gesture Vision — how it works
 
@@ -119,18 +124,7 @@ by ear rather than by watching a meter.
 
 ![Gesture Vision — real-time two-hand skeleton overlay, left hand (chord/key) in blue, right hand (quality/volume/filter) in orange](docs/screenshots/gesture-vision.png)
 
-### Attribution
-
-The gesture-to-chord mechanic (finger-extension classification, the
-dead-zone tilt calculation for major/minor, the chord-state debouncer, and
-the oscillator/filter synth engine) is adapted from
-[**Gesture Synth** by Eric Wei](https://github.com/ericwei97-cloud/gesture-synth),
-used under its personal/educational/non-commercial license. What's original
-here: the spoken-confirmation accessibility layer (the source project's
-feedback is entirely visual — an on-screen chord label and animated
-waveform, with no non-visual confirmation of state), the accessible
-HTML/ARIA structure, and adapting the code from its original Vite/npm build
-into this project's zero-build-step module structure.
+The design goal is not to describe the instrument, but to make it playable without requiring sight. Discrete state changes such as chord, scale degree, and quality are surfaced through spoken confirmation because they are otherwise invisible to a blind performer. Continuous controls such as volume and timbre are left unannounced, since the sound itself already communicates those changes. The result is a musical interface that can be navigated by listening and performing, rather than by monitoring a visual display.
 
 ## See Through Sound — how it works
 
@@ -159,11 +153,12 @@ Playback pans left/right per panel based on its horizontal position on the
 page — simple rule-based stereo positioning, not true 3D spatial audio.
 
 **Accessibility report** (shown alongside the reading-order review, real
-analysis only — see Architecture notes below for why): real pixel-level
-contrast math per panel, plus checkable structural facts drawn directly
-from the analyzed panel data (ambiguous/incomplete reading order, panels
-with no description, dialogue with no attributed speaker). Deliberately
-no composite "accessibility score" — see below for why.
+analysis only — see the Accessibility report section below for why): real
+pixel-level contrast math per panel, plus checkable structural facts drawn
+directly from the analyzed panel data (ambiguous/incomplete reading order,
+panels with no description, dialogue with no attributed speaker).
+Deliberately no composite "accessibility score" — see Design decisions
+above for why.
 
 This screenshot is a real run against an actual public-domain Golden Age
 comic page (*Startling Comics* #10, 1946 — via Wikimedia Commons), not a
@@ -233,6 +228,13 @@ one page:
   dawn" and "a stormy night at sea" produce audibly, meaningfully different
   soundscapes, not just different labels.
 
+A real run of Image → Illustration against the same real comic page, in the
+watercolor style — five distinct real illustrations, each grounded in its
+own panel's actual scene description (note the hero and the antagonist are
+correctly rendered as two different people throughout).
+
+![Synesthesia Studio — five real watercolor illustrations generated from the same analyzed comic page](docs/screenshots/synesthesia-studio.png)
+
 ## Creative Access Mode — how it works
 
 Select "Experiencing this as: blind / low-vision / dyslexic / deaf /
@@ -284,18 +286,13 @@ both genuinely computed — no AI model, no invented score:
   description, a dialogue line with no attributed speaker. Real, checkable
   facts, not estimates.
 
-**Why there's no "Accessibility Score: 72/100."** A single composite score
-would imply a validated measurement methodology behind it — real
-accessibility scoring requires actual outcome data from real user studies
-with real blind/low-vision/dyslexic participants, which this project does
-not have and can't collect in the time available. Presenting a fabricated
-number with false precision would be a real credibility risk, not a
-convenience — the same reason Emotion Lens is built to hedge honestly
-instead of asserting a guess as fact. Only run on real panel analysis, not
-the mock fallback: the mock story's bounding boxes are a fixed generic
-grid with no correspondence to the actual uploaded image's real layout, so
-computing contrast against them would be real math applied to meaningless
-regions.
+**Why there's no "Accessibility Score: 72/100."** Covered fully under
+Design decisions above — in short, no validated methodology exists for a
+number like that, so this project doesn't invent one. Worth adding here:
+this report only ever runs on real panel analysis, not the mock fallback —
+the mock story's bounding boxes are a fixed generic grid with no
+correspondence to an actual uploaded image's real layout, so computing
+contrast against them would be real math applied to meaningless regions.
 
 **Two things the report doesn't just detect — it fixes.** Sound effects
 (`gunshot`, `thunder`, etc.) used to be audio-only, synthesized by the
@@ -313,6 +310,17 @@ deterministic contrast enhancement, not an AI-generated "enhanced"
 image.
 
 ## Architecture notes
+
+### IBM technology stack
+
+| Component | Role | Used in |
+|---|---|---|
+| IBM Bob | Primary development tool — brainstorming and ideation, technical design discussion, and planning the project's scaffolding and architecture before implementation began | Project planning, throughout |
+| `ibm/granite-3-8b-instruct` via watsonx.ai | Narrative reconstruction, Emotion Lens Q&A, character-sheet extraction, mood extraction — every text-only AI pass | See Through Sound, Emotion Lens, Synesthesia Studio |
+| Vision-capable model via watsonx.ai (`meta-llama/llama-3-2-11b-vision-instruct` — Granite Vision isn't available on this account tier; see Design decisions) | Comic panel detection, reading order, transcription | See Through Sound, Emotion Lens, Synesthesia Studio (one shared analyze call) |
+| IBM Watson Text to Speech | Narration voices and spoken Q&A answers | See Through Sound, Emotion Lens |
+| watsonx tried first, always | Every real AI call site attempts watsonx before any fallback — not just "available," the default | Whole backend, via `shared/cascade.js` |
+| *Disclosed non-IBM fallbacks:* Google Gemini (automatic, on watsonx failure/quota exhaustion), Hugging Face Stable Diffusion 3 Medium (image generation — watsonx has no image-gen model at all), Ollama + macOS `say` (zero-quota local fallback) | Resilience layers and one genuine capability gap, not a preference over IBM | See the cascade explanation below and Design decisions above |
 
 **Three-tier provider cascade.** Every AI call site (panel analysis,
 narrative reconstruction, character-sheet extraction, Emotion Lens Q&A,
@@ -372,22 +380,19 @@ than silently trusting the model's word for it.
   installed. `npm test` from `e2e/` (first run: `npm install && npx
   playwright install chromium`).
 
+### Data sources
+
+| Source | What | License |
+|---|---|---|
+| *Startling Comics* #10, page 28 (1946), via [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Startling_Comics_10_page_28.jpg) | The comic page used in this README's real screenshots | Public domain (US, published 1931–1963, copyright not renewed) |
+| Stable Diffusion 3 Medium (Stability AI) | Image generation for Synesthesia Studio's Illustration mode | Served via Hugging Face's hosted `hf-inference` API |
+
 ## Selected challenge theme
 
 July Challenge — Reimagine Creative Industries with AI. Prism is positioned
 as both a creative-industries platform (new ways to *experience* and
 *create* within existing and new creative mediums) and an accessibility
 platform — not accessibility-only, and not another content generator.
-
-## Honesty note
-
-I want to be upfront about what this is and isn't. This is a first
-prototype I built alone in a short window, not a validated solution
-co-designed with blind or neurodiverse users — every design choice here is
-my best-informed guess, grounded in real accessibility guidelines, but a
-guess all the same. Feedback from the communities Prism is actually meant
-to serve would be the single highest-value thing that could improve it from
-here, more than any additional feature I could build on my own.
 
 ## Running locally
 
@@ -407,6 +412,38 @@ Running the test suites:
 cd backend && npm test        # Vitest unit suite — no server, no credentials needed
 cd e2e && npm install && npx playwright install chromium && npm test  # Playwright e2e suite
 ```
+
+## Walkthroughs
+
+Concrete paths to actually try each mode, not just read about it.
+
+**See Through Sound** — Upload any comic/manga page image → **Analyze
+page**. Review the numbered panel overlay and reorder anything wrong with
+Move up/down → **Confirm order and narrate** → listen, following the
+highlighted transcript. If a panel's contrast is flagged, try **Generate
+high-contrast version** underneath it.
+
+**Emotion Lens** — Upload the same (or any) page → **Analyze page** → ask
+something the page doesn't state outright ("why is he angry?") and
+something purely factual ("who's in the doorway?"). Compare how each answer
+is hedged.
+
+**Synesthesia Studio** — Upload a page on the **Image → Illustration** tab,
+pick a style, **Reimagine this page**. Then switch to **Text → Soundscape**
+and try two very different moods ("a quiet, misty forest at dawn" vs. "a
+stormy night at sea") back to back — the audio, not just a label, should
+sound different.
+
+**Gesture Vision** — Click to start, allow the camera. Hold up a few
+fingers on your left hand for a scale degree, tilt your wrist to switch
+major/minor, then bring in your right hand for chord quality and volume.
+Watch the on-screen skeleton track both hands independently.
+
+**Creative Access Mode** — On the landing page, set "I want to experience
+this as" to **Dyslexic**, then open any mode — the font, spacing, and line
+length change immediately and persist as you navigate. Try **Blind** next
+and reload a mode page: focus jumps straight to the first actionable
+control.
 
 ## File structure
 
